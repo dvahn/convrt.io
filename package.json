@@ -1,0 +1,17 @@
+{
+  "name": "convrt",
+  "version": "1.0.0",
+  "description": "LinkedIn Messenger",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app",
+    "dev": "nodemon app"
+  },
+  "author": "Daniel von Ahn",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.5.8",
+    "nodemon": "^2.0.4"
+  }
+}
