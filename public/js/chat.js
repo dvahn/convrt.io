@@ -52,7 +52,7 @@ function createConversation(name, image, id) {
   conversationList.appendChild(convo);
 }
 
-function setUpMessageFeed(id) {
+function setUpMessageFeed(id, image) {
   let messages = [];
   fetch("http://127.0.0.1:3000/api/messageFeeds")
     .then((res) => res.json())
@@ -80,6 +80,7 @@ function setUpMessageFeed(id) {
       let deleteConversationIcon = document.createElement("img");
       deleteConversationIcon.src = "./images/trash.svg";
       deleteConversationIcon.alt = "Delete Conversation";
+      deleteConversationIcon.id = "deleteConversation";
 
       chatTitleContainer.appendChild(chatTitle);
       chatTitleContainer.appendChild(deleteConversationIcon);
@@ -93,7 +94,7 @@ function setUpMessageFeed(id) {
         if (message.sender === currentContact) {
           messageContainer.className = "message-row other-message";
           let img = document.createElement("img");
-          img.src = "../images/stockton.jpg";
+          img.src = image;
           img.alt = currentContact;
           messageContent.appendChild(img);
         } else {
@@ -129,7 +130,7 @@ function init() {
   let first = document
     .getElementById("conversation-list")
     .getElementsByClassName("active");
-  setUpMessageFeed(first[0].id);
+  setUpMessageFeed(first[0].id, first[0].childNodes[0].src);
 
   for (conversation of conversations) {
     conversation.addEventListener("click", function () {
@@ -141,8 +142,9 @@ function init() {
 
       //set message feed
       let id = current[0].id;
+      let img = current[0].childNodes[0].src;
       if (id) {
-        setUpMessageFeed(id);
+        setUpMessageFeed(id, img);
       }
     });
   }
@@ -190,6 +192,8 @@ function sendMessage() {
     messageList.insertBefore(yourMessage, messageList.firstChild);
   }
   document.getElementById("textInput").value = "";
+
+  //TODO: add message to DB
 }
 
 const months = {
@@ -209,10 +213,18 @@ const months = {
 
 function getDate() {
   let today = new Date();
-  let dd = String(today.getDate()).padStart(2, "0");
-  let mm = String(today.getMonth() + 1).padStart(2, "0");
-  today = months[mm] + " " + dd;
-  return today;
+  // let dd = String(today.getDate()).padStart(2, "0");
+  // let mm = String(today.getMonth() + 1).padStart(2, "0");
+  // today = months[mm] + " " + dd;
+  let time = today.toLocaleTimeString();
+  let splittedTime = time.split(":");
+
+  if (splittedTime[0] <= 12) {
+    time = splittedTime[0] + ":" + splittedTime[1] + " AM";
+  } else {
+    time = (splittedTime[0] % 12) + ":" + splittedTime[1] + " PM";
+  }
+  return time;
 }
 
 // keydown events
@@ -221,3 +233,21 @@ document.getElementById("textInput").addEventListener("keydown", function (e) {
     sendMessage();
   }
 });
+
+document.getElementById("refresh").addEventListener("click", function () {
+  console.log("Clicked REFRESH");
+  //TODO: call scraping script to get new messages from LinkedIn
+  // $.ajax({
+  //   url: "crawl.py",
+  //   context: document.body,
+  // }).done(function () {
+  //   alert("finished python script");
+  // });
+});
+
+// document
+//   .getElementById("deleteConversation")
+//   .addEventListener("click", function () {
+//     console.log("Clicked DELETE");
+//     //TODO: delete current conversation from DB and LinkedIn (if possible)
+//   });

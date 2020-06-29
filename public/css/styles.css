@@ -108,6 +108,11 @@ body {
   font-size: 3.6rem;
 }
 
+.refresh {
+  grid-column: 2;
+  margin-left: 86%;
+}
+
 #chat-title {
   grid-column-start: 3;
   grid-column-end: 3;
