@@ -54,7 +54,7 @@
       </div>
       <div id="new-message-container">
         <a id="newMessage" href="#">+</a>
-        <a id="refresh" class="refresh" href="#">R</a>
+        <!-- <a id="refresh" class="refresh" href="#">R</a> -->
       </div>
       <div id="chat-title">
         <!-- <span>Max Musterboy</span>-->
@@ -84,11 +84,23 @@
           </div>
         </div> -->
       </div>
-      <div id="chat-form">
+      <!-- <div id="chat-form"> -->
+      <form id="chat-form" method="POST" action="/">
         <img id="attach" src="./images/attachement.svg" alt="Add Attachment" />
-        <input id="textInput" type="text" placeholder="Type a message..." />
-        <img id="send" src="./images/senden.svg" alt="Send Message" />
-      </div>
+        <input
+          name="message[content]"
+          id="textInput"
+          type="text"
+          placeholder="Type a message..."
+        />
+        <img
+          id="send"
+          type="submit"
+          src="./images/senden.svg"
+          alt="Send Message"
+        />
+      </form>
+      <!-- </div> -->
     </div>
   </body>
   <script src="../js/chat.js"></script>

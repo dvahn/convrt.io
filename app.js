@@ -7,8 +7,11 @@ const hostname = "127.0.0.1";
 const port = 3000;
 
 const express = require("express");
+const { nextTick } = require("process");
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded());
+app.use(express.json());
 
 const mongoClient = mongo.MongoClient;
 const url = "mongodb://localhost:27017/convrt";
@@ -55,6 +58,11 @@ app.get("/api/messageFeeds", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
   res.send(JSON.stringify(messageFeeds));
+});
+
+app.post("/", function (req, res) {
+  console.log(req.body.message.content);
+  // save message to DB
 });
 
 app.listen(3000);

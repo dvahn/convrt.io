@@ -77,12 +77,20 @@ function setUpMessageFeed(id, image) {
       let chatTitle = document.createElement("span");
       chatTitle.textContent = currentContact;
 
+      //TODO: make static
+
       let deleteConversationIcon = document.createElement("img");
       deleteConversationIcon.src = "./images/trash.svg";
       deleteConversationIcon.alt = "Delete Conversation";
       deleteConversationIcon.id = "deleteConversation";
 
+      let refreshIcon = document.createElement("img");
+      refreshIcon.src = "./images/mail.svg";
+      refreshIcon.alt = "Refresh Messages";
+      refreshIcon.id = "refresh";
+
       chatTitleContainer.appendChild(chatTitle);
+      chatTitleContainer.appendChild(refreshIcon);
       chatTitleContainer.appendChild(deleteConversationIcon);
 
       for (message of messages) {
@@ -190,6 +198,18 @@ function sendMessage() {
 
     yourMessage.appendChild(contentDiv);
     messageList.insertBefore(yourMessage, messageList.firstChild);
+
+    fetch("/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: {
+          content: text,
+        },
+      }),
+    });
   }
   document.getElementById("textInput").value = "";
 
