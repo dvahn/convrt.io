@@ -72,26 +72,14 @@ function setUpMessageFeed(id, image) {
 
       // set chat title
       let chatTitleContainer = document.getElementById("chat-title");
-      chatTitleContainer.innerHTML = "";
+      let currentTitle = document.getElementById("currentContact");
 
       let chatTitle = document.createElement("span");
       chatTitle.textContent = currentContact;
+      chatTitle.id = "currentContact";
 
-      //TODO: make static
-
-      let deleteConversationIcon = document.createElement("img");
-      deleteConversationIcon.src = "./images/trash.svg";
-      deleteConversationIcon.alt = "Delete Conversation";
-      deleteConversationIcon.id = "deleteConversation";
-
-      let refreshIcon = document.createElement("img");
-      refreshIcon.src = "./images/mail.svg";
-      refreshIcon.alt = "Refresh Messages";
-      refreshIcon.id = "refresh";
-
-      chatTitleContainer.appendChild(chatTitle);
-      chatTitleContainer.appendChild(refreshIcon);
-      chatTitleContainer.appendChild(deleteConversationIcon);
+      chatTitleContainer.removeChild(currentTitle);
+      chatTitleContainer.insertBefore(chatTitle, chatTitleContainer.firstChild);
 
       for (message of messages) {
         let messageContent = document.createElement("div");
@@ -206,6 +194,7 @@ function sendMessage() {
       },
       body: JSON.stringify({
         message: {
+          type: "message",
           content: text,
         },
       }),
@@ -256,18 +245,22 @@ document.getElementById("textInput").addEventListener("keydown", function (e) {
 
 document.getElementById("refresh").addEventListener("click", function () {
   console.log("Clicked REFRESH");
-  //TODO: call scraping script to get new messages from LinkedIn
-  // $.ajax({
-  //   url: "crawl.py",
-  //   context: document.body,
-  // }).done(function () {
-  //   alert("finished python script");
-  // });
+  fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: {
+        type: "refresh",
+      },
+    }),
+  });
 });
 
-// document
-//   .getElementById("deleteConversation")
-//   .addEventListener("click", function () {
-//     console.log("Clicked DELETE");
-//     //TODO: delete current conversation from DB and LinkedIn (if possible)
-//   });
+document
+  .getElementById("deleteConversation")
+  .addEventListener("click", function () {
+    console.log("Clicked DELETE");
+    //TODO: delete current conversation from DB and LinkedIn (if possible)
+  });

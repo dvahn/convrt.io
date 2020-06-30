@@ -2,6 +2,7 @@ from classes.core import ChromeBrowser
 from classes.core import CSV
 from selenium.common.exceptions import NoSuchElementException
 import pymongo
+import sys
 
 ## Create database ##
 client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -9,8 +10,6 @@ db = client['convrt_database']
 conversations = db['conversations']
 
 # XPATH
-
-
 xpath = {
     # angepasst!
     "number_conversations": "/html/body/div[9]/div[4]/div[1]/div/div/div[1]/ul/li",
@@ -92,4 +91,4 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])):
         # insert single message to collection of currently scraped conversation
         current_col.insert_one(message)
 
-# driver.close()
+driver.close()

@@ -7,7 +7,7 @@ const hostname = "127.0.0.1";
 const port = 3000;
 
 const express = require("express");
-const { nextTick } = require("process");
+const { PythonShell } = require("python-shell");
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded());
@@ -62,66 +62,28 @@ app.get("/api/messageFeeds", (req, res) => {
 
 app.post("/", function (req, res) {
   console.log(req.body.message.content);
-  // save message to DB
+  let type = req.body.message.type;
+  if (type === "message") {
+    console.log("message");
+    // save message to DB
+  } else if (type === "refresh") {
+    console.log("refresh");
+    // call python scraping script
+    let options = {
+      pythonPath: "/usr/bin/python3",
+      // make sure you use an absolute path for scriptPath
+      scriptPath:
+        "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/Backend/",
+    };
+
+    PythonShell.run("crawl.py", options, function (err, results) {
+      if (err) throw err;
+      // results is an array consisting of messages collected during execution
+      console.log("results: %j", results);
+    });
+  } else {
+    console.log("unknown type");
+  }
 });
 
 app.listen(3000);
-
-// const server = http.createServer((req, res) => {
-//   // File path
-//   let filePath = path.join(
-//     __dirname,
-//     "public",
-//     req.url === "/" ? "chat.html" : req.url
-//   );
-
-//   //Extension of file
-//   let extname = path.extname(filePath);
-//   let contentType = "text/html";
-//   switch (extname) {
-//     case ".js":
-//       contentType = "text/javascript";
-//       break;
-//     case ".css":
-//       contentType = "text/css";
-//       break;
-//     case ".json":
-//       contentType = "application/json";
-//       break;
-//     case ".png":
-//       contentType = "image/png";
-//       break;
-//     case ".jpg":
-//       contentType = "image/jpg";
-//       break;
-//     case ".svg":
-//       contentType = "image/svg+xml";
-//   }
-//   //   // Read file
-//   fs.readFile(filePath, (err, content) => {
-//     if (err) {
-//       if (err.code == "ENOENT") {
-//         // Page not found
-//         fs.readFile(
-//           path.join(__dirname, "public", "404.html"),
-//           (err, content) => {
-//             res.writeHead(200, { "Content-Type": "text/html" });
-//             res.end(content, "utf8");
-//           }
-//         );
-//       } else {
-//         // Server error
-//         res.writeHead(500);
-//         res.end(`Server Error: ${err.code}`);
-//       }
-//     } else {
-//       // Success
-//       res.writeHead(200, { "Content-Type": contentType });
-//       res.end(content, "utf8");
-//     }
-//   });
-// });
-
-// server.listen(port, hostname, () => {
-//   console.log(`Server running at http://${hostname}:${port}/`);
-// });
