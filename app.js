@@ -87,3 +87,9 @@ app.post("/", function (req, res) {
 });
 
 app.listen(3000);
+
+// next steps:
+
+// readme schreiben
+// python script vom Frontend callen
+// labels

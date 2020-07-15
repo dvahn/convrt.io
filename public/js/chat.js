@@ -1,6 +1,4 @@
-// DB stuff
-
-// Get all persons
+// GET ALL CONTACTS
 let persons = [];
 fetch("http://127.0.0.1:3000/api/conversations")
   .then((res) => res.json())
@@ -12,8 +10,6 @@ fetch("http://127.0.0.1:3000/api/conversations")
     init();
   })
   .catch((error) => console.log(error));
-
-// Get conversations for each person
 
 // TODO:
 // - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
@@ -62,7 +58,7 @@ function setUpMessageFeed(id, image) {
           messages = obj[id];
         }
       }
-      // delete message Feed of last selected contact
+      // DELETE MESSAGE FEED OF LAST SELECTED CONTACT
       let messageFeed = document.getElementById("chat-message-list");
       messageFeed.innerHTML = "";
 
@@ -70,7 +66,7 @@ function setUpMessageFeed(id, image) {
         .getElementById(id)
         .getElementsByClassName("title-text")[0].innerHTML;
 
-      // set chat title
+      // SET CHAT TITLE
       let chatTitleContainer = document.getElementById("chat-title");
       let currentTitle = document.getElementById("currentContact");
 
@@ -81,6 +77,7 @@ function setUpMessageFeed(id, image) {
       chatTitleContainer.removeChild(currentTitle);
       chatTitleContainer.insertBefore(chatTitle, chatTitleContainer.firstChild);
 
+      // SET UP MESSAGE FEED FOR CURRENT CONTACT
       for (message of messages) {
         let messageContent = document.createElement("div");
         messageContent.className = "message-content";
@@ -136,7 +133,7 @@ function init() {
       current[0].className = current[0].className.replace(" active", "");
       this.className += " active";
 
-      //set message feed
+      // SET UP MESSAGE FEED
       let id = current[0].id;
       let img = current[0].childNodes[0].src;
       if (id) {
@@ -145,10 +142,30 @@ function init() {
     });
   }
 
+  // INITIALIZE LABELS
+  let labelContainer = document.getElementById("label-list");
+
+  for (label of LABELS) {
+    let labelDiv = document.createElement("div");
+    labelDiv.className = "label";
+    labelDiv.onclick = onLabelClick;
+    labelDiv.id = label.name;
+
+    let labelText = document.createElement("div");
+    labelText.className = "title-text";
+    labelText.innerHTML = label.name;
+
+    labelDiv.appendChild(labelText);
+    labelContainer.appendChild(labelDiv);
+  }
+
   let labels = document
     .getElementById("label-list")
     .getElementsByClassName("label");
 
+  labels[0].className += " active";
+
+  // ADD EVENTLISTENER TO LABELS
   for (label of labels) {
     label.addEventListener("click", function () {
       let current = document
@@ -236,7 +253,7 @@ function getDate() {
   return time;
 }
 
-// keydown events
+// SEND ON ENTER (maybe more shortcuts? (new Label e.g.))
 document.getElementById("textInput").addEventListener("keydown", function (e) {
   if (e.keyCode === 13) {
     sendMessage();
@@ -264,3 +281,39 @@ document
     console.log("Clicked DELETE");
     //TODO: delete current conversation from DB and LinkedIn (if possible)
   });
+
+// LABELS
+// TODO: user can create own labels
+const LABELS = [
+  {
+    name: "All Messages",
+    tags: [],
+  },
+  {
+    name: "Job",
+    tags: ["job", "work", "project"],
+  },
+  {
+    name: "Private",
+    tags: ["family", "friends", "kids", "holidays"],
+  },
+  {
+    name: "Friends",
+    tags: ["Bob", "Jeff", "beer"],
+  },
+];
+
+// save user configurated label somewhere (to his profile?)
+function onLabelClick() {
+  let tags = [];
+
+  // GET TAGS FOR CURRENT LABEL
+  for (label of LABELS) {
+    if (label.name === this.id) {
+      tags = label.tags;
+    }
+  }
+  console.log(tags);
+
+  // TODO: filter for label tags
+}
