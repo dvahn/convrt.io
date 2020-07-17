@@ -1,3 +1,5 @@
+let allChats = [];
+
 // GET ALL CONTACTS
 let persons = [];
 fetch("http://127.0.0.1:3000/api/conversations")
@@ -5,8 +7,10 @@ fetch("http://127.0.0.1:3000/api/conversations")
   .then((data) => {
     persons = data;
     for (person of persons) {
+      allChats.push(person);
       createConversation(person.name, person.image, person.ID);
     }
+    console.log(allChats);
     init();
   })
   .catch((error) => console.log(error));
@@ -58,6 +62,7 @@ function setUpMessageFeed(id, image) {
           messages = obj[id];
         }
       }
+
       // DELETE MESSAGE FEED OF LAST SELECTED CONTACT
       let messageFeed = document.getElementById("chat-message-list");
       messageFeed.innerHTML = "";
@@ -302,6 +307,34 @@ const LABELS = [
     tags: ["Bob", "Jeff", "beer"],
   },
 ];
+
+// ADD LABEL TO CONVERSATION
+function addLabel() {
+  let label = prompt("Add Label:");
+  let id;
+  currentChat = document.getElementById("currentContact").innerHTML;
+
+  for (chat of allChats) {
+    if (chat.name === currentChat) {
+      chat.label = label;
+      id = chat.ID;
+    }
+  }
+  fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: {
+        type: "addedLabel",
+        label: label,
+        id: id,
+      },
+    }),
+  });
+  console.log(allChats);
+}
 
 // save user configurated label somewhere (to his profile?)
 function onLabelClick() {

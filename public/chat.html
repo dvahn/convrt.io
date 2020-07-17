@@ -58,6 +58,12 @@
       </div>
       <div id="chat-title">
         <span id="currentContact"></span>
+        <img
+          id="addLabel"
+          src="./images/hinzufuegen.svg"
+          alt="Add Label"
+          onclick="addLabel()"
+        />
         <img id="refresh" src="./images/mail.svg" alt="Refresh Messages" />
         <img
           id="deleteConversation"
@@ -89,8 +95,7 @@
           </div>
         </div> -->
       </div>
-      <!-- <div id="chat-form"> -->
-      <form id="chat-form" method="POST" action="/">
+      <div id="chat-form">
         <img id="attach" src="./images/attachement.svg" alt="Add Attachment" />
         <input
           name="message[content]"
@@ -98,14 +103,8 @@
           type="text"
           placeholder="Type a message..."
         />
-        <img
-          id="send"
-          type="submit"
-          src="./images/senden.svg"
-          alt="Send Message"
-        />
-      </form>
-      <!-- </div> -->
+        <img id="send" src="./images/senden.svg" alt="Send Message" />
+      </div>
     </div>
   </body>
   <script src="../js/chat.js"></script>

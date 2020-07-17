@@ -26,7 +26,7 @@ body {
   grid-template-rows: 10% 78% 12%;
 
   min-width: 1000px;
-  max-width: 1200px;
+  max-width: 1000px;
   max-height: 800px;
   height: 95vh;
   background: #fff;
@@ -122,10 +122,11 @@ body {
   padding: 0 20px;
 
   display: grid;
-  grid: 36px / 1fr 36px 36px;
+  grid: 36px / 1fr 36px 36px 36px;
   grid-gap: 30px;
   align-content: center;
   align-items: center;
+  z-index: 2;
 }
 
 #chat-title > img {
@@ -299,6 +300,7 @@ body {
   padding: 9px 14px;
   font-size: 1.6rem;
   margin-bottom: 5px;
+  z-index: 1;
 }
 
 .message-time {

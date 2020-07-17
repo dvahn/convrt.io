@@ -61,11 +61,10 @@ app.get("/api/messageFeeds", (req, res) => {
 });
 
 app.post("/", function (req, res) {
-  console.log(req.body.message.content);
   let type = req.body.message.type;
   if (type === "message") {
     console.log("message");
-    // save message to DB
+    // TODO: save message to DB
   } else if (type === "refresh") {
     console.log("refresh");
     // call python scraping script
@@ -81,8 +80,11 @@ app.post("/", function (req, res) {
       // results is an array consisting of messages collected during execution
       console.log("results: %j", results);
     });
+  } else if (type === "addedLabel") {
+    console.log("New Label!", req.body.message.label, req.body.message.id);
+    // TODO: push to database
   } else {
-    console.log("unknown type");
+    console.log("Unknown type!");
   }
 });
 
