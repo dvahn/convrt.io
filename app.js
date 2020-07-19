@@ -19,10 +19,10 @@ const url = "mongodb://localhost:27017/convrt";
 let data = [];
 let messageFeeds = [];
 mongoClient.connect(url, (err, db) => {
-  dbo = db.db("convrt_database");
+  let dbo = db.db("convrt_database");
   dbo
     .collection("conversations")
-    .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1 } })
+    .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1, label: 1 } })
     .toArray((err, result) => {
       data = result;
       console.log(data);
@@ -63,8 +63,29 @@ app.get("/api/messageFeeds", (req, res) => {
 app.post("/", function (req, res) {
   let type = req.body.message.type;
   if (type === "message") {
-    console.log("message");
-    // TODO: save message to DB
+    console.log(
+      "message",
+      req.body.message.sender,
+      req.body.message.time,
+      req.body.message.content,
+      req.body.message.id
+    );
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+      let dbo = db.db("convrt_database");
+      let newMessage = {
+        sender: req.body.message.sender,
+        time: req.body.message.time,
+        content: req.body.message.content,
+      };
+      dbo
+        .collection(req.body.message.id)
+        .insertOne(newMessage, function (err, res) {
+          if (err) throw err;
+          console.log("1 document inserted");
+          db.close();
+        });
+    });
   } else if (type === "refresh") {
     console.log("refresh");
     // call python scraping script
@@ -82,7 +103,19 @@ app.post("/", function (req, res) {
     });
   } else if (type === "addedLabel") {
     console.log("New Label!", req.body.message.label, req.body.message.id);
-    // TODO: push to database
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+      let dbo = db.db("convrt_database");
+      let query = { ID: req.body.message.id };
+      let newLabel = { $set: { label: req.body.message.label } };
+      dbo
+        .collection("conversations")
+        .updateOne(query, newLabel, function (err, res) {
+          if (err) throw err;
+          console.log("1 document updated");
+          db.close();
+        });
+    });
   } else {
     console.log("Unknown type!");
   }

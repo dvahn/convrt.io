@@ -11,7 +11,7 @@ fetch("http://127.0.0.1:3000/api/conversations")
       createConversation(person.name, person.image, person.ID);
     }
     console.log(allChats);
-    init();
+    init("initialLoad");
   })
   .catch((error) => console.log(error));
 
@@ -118,7 +118,7 @@ function setUpMessageFeed(id, image) {
     .catch((error) => console.log(error));
 }
 
-function init() {
+function init(type) {
   let conversations = document
     .getElementById("conversation-list")
     .getElementsByClassName("conversation");
@@ -146,8 +146,14 @@ function init() {
       }
     });
   }
+  if (type === "initialLoad") {
+    initLabels();
+  }
+  document.getElementById("send").addEventListener("click", sendMessage);
+}
 
-  // INITIALIZE LABELS
+// INITIALIZE LABELS
+function initLabels() {
   let labelContainer = document.getElementById("label-list");
 
   for (label of LABELS) {
@@ -180,12 +186,23 @@ function init() {
       this.className += " active";
     });
   }
-  document.getElementById("send").addEventListener("click", sendMessage);
 }
 
 function sendMessage() {
   let text = document.getElementById("textInput").value;
   let messageList = document.getElementById("chat-message-list");
+  let id;
+  let sender;
+  currentChat = document.getElementById("currentContact").innerHTML;
+
+  for (chat of allChats) {
+    if (chat.name === currentChat) {
+      id = chat.ID;
+
+      // TODO: get name of user profile
+      sender = "Daniel von Ahn";
+    }
+  }
 
   if (text !== "") {
     let yourMessage = document.createElement("div");
@@ -218,13 +235,14 @@ function sendMessage() {
         message: {
           type: "message",
           content: text,
+          id: id,
+          sender: sender,
+          time: getDate(),
         },
       }),
     });
   }
   document.getElementById("textInput").value = "";
-
-  //TODO: add message to DB
 }
 
 const months = {
@@ -333,20 +351,26 @@ function addLabel() {
       },
     }),
   });
-  console.log(allChats);
 }
 
-// save user configurated label somewhere (to his profile?)
+// SORT CHATS BY LABEL
 function onLabelClick() {
   let tags = [];
-
+  let labelName;
   // GET TAGS FOR CURRENT LABEL
-  for (label of LABELS) {
+  for (let label of LABELS) {
     if (label.name === this.id) {
       tags = label.tags;
+      labelName = label.name;
     }
   }
-  console.log(tags);
-
-  // TODO: filter for label tags
+  document.getElementById("conversation-list").innerHTML = "";
+  for (chat of allChats) {
+    if (labelName === "All Messages") {
+      createConversation(chat.name, chat.image, chat.ID);
+    } else if (chat.label === labelName) {
+      createConversation(chat.name, chat.image, chat.ID);
+    }
+  }
+  init();
 }

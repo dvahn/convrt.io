@@ -11,17 +11,17 @@ conversations = db['conversations']
 
 # XPATH
 xpath = {
-    # changes irregularly!
-    "number_conversations": "/html/body/div[10]/div[5]/div[1]/div/div/div[1]/ul/li",
+    # changes irregularly! (daily?)
+    "number_conversations": "/html/body/div[9]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div[1]/h3",
     "image": "//li[{pos}]/div/div/a/div/div/img",
     "number_messages": "//div/div/div[2]/div[4]/div/ul/li",
     # TODO: xpath for day
-    "sender": "/html/body/div[10]/div[5]/div[1]/div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[1]/a/span",
+    "sender": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[1]/a/span",
     "time": "//li[{pos}]/div/div[1]/time",
-    "message": "/html/body/div[10]/div[5]/div[1]/div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[2]/p",
-    "only_message": "/html/body/div[10]/div[5]/div[1]/div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div/p"
+    "message": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[2]/p",
+    "only_message": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div/p"
 }
 
 
@@ -55,7 +55,7 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
     image_src = image.get_attribute("src")
 
     # add name + id to conversation collection
-    new = {"name": name, "ID": id, "image": image_src}
+    new = {"name": name, "ID": id, "image": image_src, "label": ""}
     conversations.insert_one(new)
 
     # create collection for currently scraped conversation
