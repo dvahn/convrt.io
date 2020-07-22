@@ -18,31 +18,33 @@ const url = "mongodb://localhost:27017/convrt";
 
 let data = [];
 let messageFeeds = [];
-mongoClient.connect(url, (err, db) => {
-  let dbo = db.db("convrt_database");
-  dbo
-    .collection("conversations")
-    .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1, label: 1 } })
-    .toArray((err, result) => {
-      data = result;
-      console.log(data);
-      for (let i = 0; i < data.length; i++) {
-        console.log(data[i].ID);
-        dbo
-          .collection(data[i].ID)
-          .find({}, { projection: { _id: 0, sender: 1, time: 1, content: 1 } })
-          .toArray((err, result) => {
-            let obj = {};
-            obj[data[i].ID] = result;
-            messageFeeds.push(obj);
-          });
-      }
-    });
-
-  console.log(messageFeeds);
-});
 
 app.get("/", (req, res) => {
+  mongoClient.connect(url, (err, db) => {
+    let dbo = db.db("convrt_database");
+    dbo
+      .collection("conversations")
+      .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1, label: 1 } })
+      .toArray((err, result) => {
+        data = result;
+        console.log(data);
+        for (let i = 0; i < data.length; i++) {
+          console.log(data[i].ID);
+          dbo
+            .collection(data[i].ID)
+            .find(
+              {},
+              { projection: { _id: 0, sender: 1, time: 1, content: 1 } }
+            )
+            .toArray((err, result) => {
+              let obj = {};
+              obj[data[i].ID] = result;
+              messageFeeds.push(obj);
+            });
+        }
+      });
+    console.log(messageFeeds);
+  });
   res.sendFile(
     "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/public/chat.html"
   );
@@ -102,7 +104,7 @@ app.post("/", function (req, res) {
       console.log("results: %j", results);
     });
   } else if (type === "addedLabel") {
-    console.log("New Label!", req.body.message.label, req.body.message.id);
+    // console.log("New Label!", req.body.message.label, req.body.message.id);
     mongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("convrt_database");
@@ -112,7 +114,6 @@ app.post("/", function (req, res) {
         .collection("conversations")
         .updateOne(query, newLabel, function (err, res) {
           if (err) throw err;
-          console.log("1 document updated");
           db.close();
         });
     });

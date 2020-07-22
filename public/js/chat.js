@@ -195,6 +195,8 @@ function sendMessage() {
   let sender;
   currentChat = document.getElementById("currentContact").innerHTML;
 
+  // TODO: save messages for current session
+
   for (chat of allChats) {
     if (chat.name === currentChat) {
       id = chat.ID;
