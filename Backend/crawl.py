@@ -12,9 +12,9 @@ conversations = db['conversations']
 # XPATH
 xpath = {
     # changes irregularly! (daily?)
-    "number_conversations": "/html/body/div[9]/div[5]/div[1]/div/div/div[1]/ul/li",
+    "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
-    "name": "//li[{pos}]/div/a/div[2]/div[1]/h3",
+    "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
     "image": "//li[{pos}]/div/div/a/div/div/img",
     "number_messages": "//div/div/div[2]/div[4]/div/ul/li",
     # TODO: xpath for day

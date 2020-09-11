@@ -20,6 +20,7 @@ fetch("http://127.0.0.1:3000/api/conversations")
 // - safe convos in DB
 // - implement search functionality
 // - get labels working (save labels to person)
+// - save send messages to db immediately + update API instantaneously
 
 // frontend stuff
 function createConversation(name, image, id) {
@@ -257,9 +258,9 @@ const months = {
   "07": "Jul",
   "08": "Aug",
   "09": "Sep",
-  "10": "Okt",
-  "11": "Nov",
-  "12": "Dec",
+  10: "Okt",
+  11: "Nov",
+  12: "Dec",
 };
 
 function getDate() {

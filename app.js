@@ -19,7 +19,7 @@ const url = "mongodb://localhost:27017/convrt";
 let data = [];
 let messageFeeds = [];
 
-app.get("/", (req, res) => {
+function updateAPI() {
   mongoClient.connect(url, (err, db) => {
     let dbo = db.db("convrt_database");
     dbo
@@ -45,6 +45,10 @@ app.get("/", (req, res) => {
       });
     console.log(messageFeeds);
   });
+}
+
+app.get("/", (req, res) => {
+  updateAPI();
   res.sendFile(
     "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/public/chat.html"
   );
@@ -53,12 +57,14 @@ app.get("/", (req, res) => {
 app.get("/api/conversations", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
+  // TODO: CLEAR PAGE
   res.send(JSON.stringify(data));
 });
 
 app.get("/api/messageFeeds", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
+  // TODO: CLEAR PAGE
   res.send(JSON.stringify(messageFeeds));
 });
 
@@ -120,6 +126,7 @@ app.post("/", function (req, res) {
   } else {
     console.log("Unknown type!");
   }
+  updateAPI();
 });
 
 app.listen(3000);
