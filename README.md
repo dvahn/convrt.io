@@ -20,9 +20,12 @@ Execute crawling script:
 Wait for the script to finish. When having no errors your MongoDB should now hold collections of all your LinkedIn message feeds.
 
 If a part of the process fails or you want to reset the database for some other reason go to:
+
 `cd Backend`
 and run:
+
 `python clearDB.py`
+
 to clear your mongoDB database. After running the crawl-script again you should have a database perfectly up-to-date with your LinkedIn messenger.
 
 ### Running the chat
