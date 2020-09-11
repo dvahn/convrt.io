@@ -11,4 +11,4 @@
 
 ### Developer mode
 
-npm run dev
+`npm run dev`

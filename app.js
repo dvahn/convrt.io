@@ -90,7 +90,6 @@ app.post("/", function (req, res) {
         .collection(req.body.message.id)
         .insertOne(newMessage, function (err, res) {
           if (err) throw err;
-          console.log("1 document inserted");
           db.close();
         });
     });

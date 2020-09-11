@@ -68,9 +68,7 @@ function setUpMessageFeed(id, image) {
       let messageFeed = document.getElementById("chat-message-list");
       messageFeed.innerHTML = "";
 
-      let currentContact = document
-        .getElementById(id)
-        .getElementsByClassName("title-text")[0].innerHTML;
+      let currentContact = document.getElementById(id).getElementsByClassName("title-text")[0].innerHTML;
 
       // SET CHAT TITLE
       let chatTitleContainer = document.getElementById("chat-title");
@@ -120,22 +118,16 @@ function setUpMessageFeed(id, image) {
 }
 
 function init(type) {
-  let conversations = document
-    .getElementById("conversation-list")
-    .getElementsByClassName("conversation");
+  let conversations = document.getElementById("conversation-list").getElementsByClassName("conversation");
 
-  conversations[0].className += " active";
-
-  let first = document
-    .getElementById("conversation-list")
-    .getElementsByClassName("active");
-  setUpMessageFeed(first[0].id, first[0].childNodes[0].src);
-
+  if (conversations.length != 0) {
+    conversations[0].className += " active";
+    let first = document.getElementById("conversation-list").getElementsByClassName("active");
+    setUpMessageFeed(first[0].id, first[0].childNodes[0].src);
+  }
   for (conversation of conversations) {
     conversation.addEventListener("click", function () {
-      let current = document
-        .getElementById("conversation-list")
-        .getElementsByClassName("active");
+      let current = document.getElementById("conversation-list").getElementsByClassName("active");
       current[0].className = current[0].className.replace(" active", "");
       this.className += " active";
 
@@ -171,18 +163,14 @@ function initLabels() {
     labelContainer.appendChild(labelDiv);
   }
 
-  let labels = document
-    .getElementById("label-list")
-    .getElementsByClassName("label");
+  let labels = document.getElementById("label-list").getElementsByClassName("label");
 
   labels[0].className += " active";
 
   // ADD EVENTLISTENER TO LABELS
   for (label of labels) {
     label.addEventListener("click", function () {
-      let current = document
-        .getElementById("label-list")
-        .getElementsByClassName("active");
+      let current = document.getElementById("label-list").getElementsByClassName("active");
       current[0].className = current[0].className.replace(" active", "");
       this.className += " active";
     });
@@ -194,14 +182,11 @@ function sendMessage() {
   let messageList = document.getElementById("chat-message-list");
   let id;
   let sender;
-  currentChat = document.getElementById("currentContact").innerHTML;
-
-  // TODO: save messages for current session
+  currentContactId = document.getElementsByClassName("conversation active")[0].id;
 
   for (chat of allChats) {
-    if (chat.name === currentChat) {
+    if (chat.ID === currentContactId) {
       id = chat.ID;
-
       // TODO: get name of user profile
       sender = "Daniel von Ahn";
     }
@@ -301,12 +286,10 @@ document.getElementById("refresh").addEventListener("click", function () {
   });
 });
 
-document
-  .getElementById("deleteConversation")
-  .addEventListener("click", function () {
-    console.log("Clicked DELETE");
-    //TODO: delete current conversation from DB and LinkedIn (if possible)
-  });
+document.getElementById("deleteConversation").addEventListener("click", function () {
+  console.log("Clicked DELETE");
+  //TODO: delete current conversation from DB and LinkedIn (if possible)
+});
 
 // LABELS
 // TODO: user can create own labels
