@@ -17,10 +17,7 @@ fetch("http://127.0.0.1:3000/api/conversations")
 
 // TODO:
 // - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
-// - safe convos in DB
 // - implement search functionality
-// - get labels working (save labels to person)
-// - save send messages to db immediately + update API instantaneously
 
 // frontend stuff
 function createConversation(name, image, id) {
