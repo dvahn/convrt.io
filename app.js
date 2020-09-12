@@ -32,10 +32,7 @@ function updateAPI() {
           console.log(data[i].ID);
           dbo
             .collection(data[i].ID)
-            .find(
-              {},
-              { projection: { _id: 0, sender: 1, time: 1, content: 1 } }
-            )
+            .find({}, { projection: { _id: 0, sender: 1, time: 1, content: 1 } })
             .toArray((err, result) => {
               let obj = {};
               obj[data[i].ID] = result;
@@ -49,9 +46,7 @@ function updateAPI() {
 
 app.get("/", (req, res) => {
   updateAPI();
-  res.sendFile(
-    "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/public/chat.html"
-  );
+  res.sendFile("/Users/daniel/Documents/Master/ChatBot Projekt/convrt/public/chat.html");
 });
 
 app.get("/api/conversations", (req, res) => {
@@ -86,12 +81,10 @@ app.post("/", function (req, res) {
         time: req.body.message.time,
         content: req.body.message.content,
       };
-      dbo
-        .collection(req.body.message.id)
-        .insertOne(newMessage, function (err, res) {
-          if (err) throw err;
-          db.close();
-        });
+      dbo.collection(req.body.message.id).insertOne(newMessage, function (err, res) {
+        if (err) throw err;
+        db.close();
+      });
     });
   } else if (type === "refresh") {
     console.log("refresh");
@@ -99,8 +92,7 @@ app.post("/", function (req, res) {
     let options = {
       pythonPath: "/usr/bin/python3",
       // make sure you use an absolute path for scriptPath
-      scriptPath:
-        "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/Backend/",
+      scriptPath: "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/Backend/",
     };
 
     PythonShell.run("crawl.py", options, function (err, results) {
@@ -115,13 +107,13 @@ app.post("/", function (req, res) {
       let dbo = db.db("convrt_database");
       let query = { ID: req.body.message.id };
       let newLabel = { $set: { label: req.body.message.label } };
-      dbo
-        .collection("conversations")
-        .updateOne(query, newLabel, function (err, res) {
-          if (err) throw err;
-          db.close();
-        });
+      dbo.collection("conversations").updateOne(query, newLabel, function (err, res) {
+        if (err) throw err;
+        db.close();
+      });
     });
+  } else if (type === "createdLabel") {
+    // TODO: add labels to DB
   } else {
     console.log("Unknown type!");
   }
