@@ -357,3 +357,27 @@ function onLabelClick() {
   }
   init();
 }
+
+function toggleNewLabel() {
+  if (document.getElementById("labelForm").style.display === "none") {
+    document.getElementById("labelForm").style.display = "block";
+  } else {
+    document.getElementById("labelForm").style.display = "none";
+  }
+}
+
+function closeLabelForm() {
+  document.getElementById("labelForm").style.display = "none";
+}
+
+function createNewLabel() {
+  let newLabelName = document.getElementById("newLabelInput").value;
+  let newLabelTags = [];
+
+  LABELS.push({
+    name: newLabelName,
+    tags: newLabelTags,
+  });
+  // TODO: save new Labels to DB and list them in labels view
+  console.log(LABELS);
+}

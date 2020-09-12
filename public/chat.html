@@ -3,12 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>CONVRT.io</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      media="screen"
-      href="./css/styles.css"
-    />
+    <link rel="stylesheet" type="text/css" media="screen" href="./css/styles.css" />
   </head>
   <body>
     <div id="chat-container">
@@ -51,24 +46,25 @@
           </div>
         </div> -->
       </div>
-      <div id="new-message-container">
-        <a id="newMessage" href="#">+</a>
+      <div id="new-label-container">
+        <a id="newLabel" href="#" onclick="toggleNewLabel()">+</a>
         <!-- <a id="refresh" class="refresh" href="#">R</a> -->
+      </div>
+      <div class="label-popup" id="labelForm" style="display: none">
+        <form class="form-container">
+          <h1>Add a new label</h1>
+
+          <input id="newLabelInput" type="text" placeholder="Enter new label name" required />
+
+          <button class="btn" onclick="createNewLabel()">Save</button>
+          <button class="btn cancel" onclick="closeLabelForm()">Close</button>
+        </form>
       </div>
       <div id="chat-title">
         <span id="currentContact"></span>
-        <img
-          id="addLabel"
-          src="./images/hinzufuegen.svg"
-          alt="Add Label"
-          onclick="addLabel()"
-        />
+        <img id="addLabel" src="./images/hinzufuegen.svg" alt="Add Label" onclick="addLabel()" />
         <img id="refresh" src="./images/mail.svg" alt="Refresh Messages" />
-        <img
-          id="deleteConversation"
-          src="./images/trash.svg"
-          alt="Delete Conversation"
-        />
+        <img id="deleteConversation" src="./images/trash.svg" alt="Delete Conversation" />
       </div>
       <div id="chat-message-list">
         <!-- <div class="message-row you-message">
@@ -96,12 +92,7 @@
       </div>
       <div id="chat-form">
         <img id="attach" src="./images/attachement.svg" alt="Add Attachment" />
-        <input
-          name="message[content]"
-          id="textInput"
-          type="text"
-          placeholder="Type a message..."
-        />
+        <input name="message[content]" id="textInput" type="text" placeholder="Type a message..." />
         <img id="send" src="./images/senden.svg" alt="Send Message" />
       </div>
     </div>
