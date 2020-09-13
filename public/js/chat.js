@@ -374,9 +374,21 @@ function createNewLabel() {
   let newLabelName = document.getElementById("newLabelInput").value;
   let newLabelTags = [];
 
-  LABELS.push({
-    name: newLabelName,
-    tags: newLabelTags,
+  let newLabel = { name: newLabelName, tags: newLabelTags };
+
+  LABELS.push(newLabel);
+
+  fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: {
+        type: "createdLabel",
+        newLabel: newLabel,
+      },
+    }),
   });
   // TODO: save new Labels to DB and list them in labels view
   console.log(LABELS);

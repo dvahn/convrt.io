@@ -18,6 +18,7 @@ const url = "mongodb://localhost:27017/convrt";
 
 let data = [];
 let messageFeeds = [];
+let labels = [];
 
 function updateAPI() {
   mongoClient.connect(url, (err, db) => {
@@ -41,6 +42,13 @@ function updateAPI() {
         }
       });
     console.log(messageFeeds);
+    dbo
+      .collection("labels")
+      .find({}, { projection: { _id: 0, label: 1 } })
+      .toArray((err, result) => {
+        labels = result;
+      });
+    console.log(labels);
   });
 }
 
@@ -61,6 +69,13 @@ app.get("/api/messageFeeds", (req, res) => {
   res.setHeader("content-type", "application/json");
   // TODO: CLEAR PAGE
   res.send(JSON.stringify(messageFeeds));
+});
+
+app.get("/api/labels", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  // TODO: CLEAR PAGE
+  res.send(JSON.stringify(labels));
 });
 
 app.post("/", function (req, res) {
@@ -106,14 +121,23 @@ app.post("/", function (req, res) {
       if (err) throw err;
       let dbo = db.db("convrt_database");
       let query = { ID: req.body.message.id };
-      let newLabel = { $set: { label: req.body.message.label } };
-      dbo.collection("conversations").updateOne(query, newLabel, function (err, res) {
+      let label = { $set: { label: req.body.message.label } };
+      dbo.collection("conversations").updateOne(query, label, function (err, res) {
         if (err) throw err;
         db.close();
       });
     });
   } else if (type === "createdLabel") {
     // TODO: add labels to DB
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+      let dbo = db.db("convrt_database");
+      let newLabel = { label: req.body.message.newLabel };
+      dbo.collection("labels").insertOne(newLabel, function (err, res) {
+        if (err) throw err;
+        db.close();
+      });
+    });
   } else {
     console.log("Unknown type!");
   }
