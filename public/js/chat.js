@@ -1,4 +1,10 @@
 let allChats = [];
+let allLabels = [
+  {
+    name: "All Messages",
+    tags: [],
+  },
+];
 
 // GET ALL CONTACTS
 let persons = [];
@@ -11,15 +17,12 @@ fetch("http://127.0.0.1:3000/api/conversations")
       createConversation(person.name, person.image, person.ID);
     }
     console.log(allChats);
-    init("initialLoad");
+    getLabels();
+    init();
   })
   .catch((error) => console.log(error));
 
-// TODO:
-// - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
-// - implement search functionality
-
-// frontend stuff
+// SET UP CONVERSATIONS
 function createConversation(name, image, id) {
   let conversationList = document.getElementById("conversation-list");
 
@@ -114,7 +117,7 @@ function setUpMessageFeed(id, image) {
     .catch((error) => console.log(error));
 }
 
-function init(type) {
+function init() {
   let conversations = document.getElementById("conversation-list").getElementsByClassName("conversation");
 
   if (conversations.length != 0) {
@@ -136,17 +139,17 @@ function init(type) {
       }
     });
   }
-  if (type === "initialLoad") {
-    initLabels();
-  }
   document.getElementById("send").addEventListener("click", sendMessage);
+  initLabels();
 }
 
 // INITIALIZE LABELS
 function initLabels() {
   let labelContainer = document.getElementById("label-list");
+  let counter = 0;
 
-  for (label of LABELS) {
+  for (label of allLabels) {
+    console.log(counter);
     let labelDiv = document.createElement("div");
     labelDiv.className = "label";
     labelDiv.onclick = onLabelClick;
@@ -158,13 +161,12 @@ function initLabels() {
 
     labelDiv.appendChild(labelText);
     labelContainer.appendChild(labelDiv);
+    counter++;
   }
 
+  // ADD EVENTLISTENER TO LABELS
   let labels = document.getElementById("label-list").getElementsByClassName("label");
 
-  labels[0].className += " active";
-
-  // ADD EVENTLISTENER TO LABELS
   for (label of labels) {
     label.addEventListener("click", function () {
       let current = document.getElementById("label-list").getElementsByClassName("active");
@@ -172,6 +174,8 @@ function initLabels() {
       this.className += " active";
     });
   }
+
+  labels[0].className += " active";
 }
 
 function sendMessage() {
@@ -289,25 +293,23 @@ document.getElementById("deleteConversation").addEventListener("click", function
 });
 
 // LABELS
-// TODO: user can create own labels
-const LABELS = [
-  {
-    name: "All Messages",
-    tags: [],
-  },
-  {
-    name: "Job",
-    tags: ["job", "work", "project"],
-  },
-  {
-    name: "Private",
-    tags: ["family", "friends", "kids", "holidays"],
-  },
-  {
-    name: "Friends",
-    tags: ["Bob", "Jeff", "beer"],
-  },
-];
+
+// FETCH LABELS FROM API
+function getLabels() {
+  //allLabels = [];
+  fetch("http://127.0.0.1:3000/api/labels")
+    .then((res) => res.json())
+    .then((data) => {
+      labels = data;
+      for (label of labels) {
+        allLabels.push({
+          name: label.name,
+          tags: label.tags,
+        });
+      }
+    })
+    .catch((error) => console.log(error));
+}
 
 // ADD LABEL TO CONVERSATION
 function addLabel() {
@@ -341,7 +343,7 @@ function onLabelClick() {
   let tags = [];
   let labelName;
   // GET TAGS FOR CURRENT LABEL
-  for (let label of LABELS) {
+  for (let label of allLabels) {
     if (label.name === this.id) {
       tags = label.tags;
       labelName = label.name;
@@ -359,24 +361,26 @@ function onLabelClick() {
 }
 
 function toggleNewLabel() {
-  if (document.getElementById("labelForm").style.display === "none") {
-    document.getElementById("labelForm").style.display = "block";
+  let icon = document.getElementById("newLabelIcon");
+  let background = document.getElementById("newLabel");
+  if (document.getElementById("newLabelForm").style.display === "none") {
+    document.getElementById("newLabelForm").style.display = "block";
+    icon.className = "newLabelIconRotated";
+    background.style = "background-color: red;";
   } else {
-    document.getElementById("labelForm").style.display = "none";
+    document.getElementById("newLabelForm").style.display = "none";
+    icon.className = "";
+    background.style = "background-color: white;";
   }
 }
 
 function closeLabelForm() {
-  document.getElementById("labelForm").style.display = "none";
+  document.getElementById("newLabelForm").style.display = "none";
 }
 
 function createNewLabel() {
   let newLabelName = document.getElementById("newLabelInput").value;
   let newLabelTags = [];
-
-  let newLabel = { name: newLabelName, tags: newLabelTags };
-
-  LABELS.push(newLabel);
 
   fetch("/", {
     method: "POST",
@@ -386,10 +390,13 @@ function createNewLabel() {
     body: JSON.stringify({
       message: {
         type: "createdLabel",
-        newLabel: newLabel,
+        name: newLabelName,
+        tags: newLabelTags,
       },
     }),
   });
-  // TODO: save new Labels to DB and list them in labels view
-  console.log(LABELS);
 }
+
+// TODO:
+// - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
+// - implement search functionality

@@ -47,18 +47,11 @@
         </div> -->
       </div>
       <div id="new-label-container">
-        <a id="newLabel" href="#" onclick="toggleNewLabel()">+</a>
+        <a id="newLabel" href="#" onclick="toggleNewLabel()"> <img id="newLabelIcon" src="./images/add.svg" /> </a>
         <!-- <a id="refresh" class="refresh" href="#">R</a> -->
-      </div>
-      <div class="label-popup" id="labelForm" style="display: none">
-        <form class="form-container">
-          <h1>Add a new label</h1>
-
-          <input id="newLabelInput" type="text" placeholder="Enter new label name" required />
-
-          <button class="btn" onclick="createNewLabel()">Save</button>
-          <button class="btn cancel" onclick="closeLabelForm()">Close</button>
-        </form>
+        <div id="newLabelForm" style="display: none">
+          <input class="newLabelFormInput" placeholder="New Label" />
+        </div>
       </div>
       <div id="chat-title">
         <span id="currentContact"></span>

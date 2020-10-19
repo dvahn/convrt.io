@@ -44,7 +44,7 @@ function updateAPI() {
     console.log(messageFeeds);
     dbo
       .collection("labels")
-      .find({}, { projection: { _id: 0, label: 1 } })
+      .find({}, { projection: { _id: 0, name: 1, tags: 1 } })
       .toArray((err, result) => {
         labels = result;
       });
@@ -132,7 +132,7 @@ app.post("/", function (req, res) {
     mongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("convrt_database");
-      let newLabel = { label: req.body.message.newLabel };
+      let newLabel = { name: req.body.message.name, tags: req.body.message.tags };
       dbo.collection("labels").insertOne(newLabel, function (err, res) {
         if (err) throw err;
         db.close();
