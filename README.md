@@ -11,24 +11,12 @@ Convrt.io is an alternative chatting interface for the messenger provided by Lin
 
 ## Running the project
 
-### Crawling messages from LinkedIn
+### Setup
 
-Go into project folder. Then:
-`cd Backend`
+From the project folder simply run:
+`npm run setup`
 
-Execute crawling script:
-`python3 crawl.py`
-
-Wait for the script to finish. When having no errors your MongoDB should now hold collections of all your LinkedIn message feeds.
-
-If a part of the process fails or you want to reset the database for some other reason go to:
-
-`cd Backend`
-and run:
-
-`python clearDB.py`
-
-to clear your mongoDB database. After running the crawl-script again you should have a database perfectly up-to-date with your LinkedIn messenger.
+This will automatically erase all data from the database and crawl it freshly from your LinkedIn messenger feed.
 
 ### Running the chat
 
