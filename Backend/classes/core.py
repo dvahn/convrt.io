@@ -2,19 +2,20 @@
 from selenium import webdriver
 from configparser import ConfigParser
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-#from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-#from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+# from selenium.webdriver.firefox.options import Options
 # from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-#from selenium.webdriver.common.keys import Keys
-#from selenium.webdriver.common.action_chains import ActionChains
+# from selenium.webdriver.common.keys import Keys
+# from selenium.webdriver.common.action_chains import ActionChains
 # from selenium.common import exceptions
-#from selenium.common.exceptions import NoSuchElementException
+# from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime
 import time
 import sys
+import os
 from random import seed
 from random import randint
 
@@ -25,7 +26,12 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
     def __init__(self):
 
         self.config = ConfigParser()
-        self.config.read('crawl.config')
+        scriptDirectory = os.path.dirname(os.path.realpath(__file__))
+        settingsFilePath = os.path.join(scriptDirectory, "crawl.config")
+        # self.config.read(os.path.join(
+        #     os.path.dirname(__file__), 'crawl.config'))
+
+        self.config.readfp(open(settingsFilePath, "r"))
         self.mode = self.config.get('PROFILE', 'mode')
         self.profile = self.config.get('PROFILE', 'name')
 
@@ -33,8 +39,8 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
         self.MAX_WAIT = int(self.config.get('GENERAL', 'max_wait'))
 
         if self.mode == "REMOTE":
-            executor = "http://" + \
-                self.config.get('REMOTE', 'host') + ":4444/wd/hub"
+            executor = "http://"
+            self.config.get('REMOTE', 'host') + ":4444/wd/hub"
             exec_path_chrome = self.config.get('REMOTE', 'exec_path_chrome')
             options = webdriver.ChromeOptions()  # Chrome Options
             # Extract this path from "chrome://version/"
@@ -50,7 +56,7 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
             self = webdriver.Remote.__init__(
                 self, command_executor=executor, desired_capabilities=options.to_capabilities())
 
-            #self = webdriver.Remote.__init__(self, command_executor="http://127.0.0.1:4444/wd/hub", desired_capabilities=options.to_capabilities())
+            # self = webdriver.Remote.__init__(self, command_executor="http://127.0.0.1:4444/wd/hub", desired_capabilities=options.to_capabilities())
 
         if self.mode == "LOCAL":
 
@@ -94,13 +100,13 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
     # LEARNING: better use get_elementS and extract text from list
     def get_element(self, xpath):
 
-        #WebDriverWait(driver, DETECTION_ACCURACY).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        # WebDriverWait(driver, DETECTION_ACCURACY).until(EC.presence_of_element_located((By.XPATH, xpath)))
         element = self.find_element_by_xpath(xpath)
         return element
 
     def get_elements(self, xpath):
 
-        #WebDriverWait(driver, DETECTION_ACCURACY).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        # WebDriverWait(driver, DETECTION_ACCURACY).until(EC.presence_of_element_located((By.XPATH, xpath)))
         elements = self.find_elements_by_xpath(xpath)
         return elements
 
