@@ -4,7 +4,7 @@ const fs = require("fs");
 const mongo = require("mongodb");
 
 const hostname = "127.0.0.1";
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const express = require("express");
 const { PythonShell } = require("python-shell");
@@ -144,7 +144,7 @@ app.post("/", function (req, res) {
   updateAPI();
 });
 
-app.listen(3000);
+app.listen(port);
 
 // next steps:
 
