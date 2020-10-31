@@ -1,7 +1,20 @@
+let initialLoad = true;
 let allChats = [];
 let allLabels = [
   {
     name: "All Messages",
+    tags: [],
+  },
+  {
+    name: "Job",
+    tags: [],
+  },
+  {
+    name: "Family",
+    tags: [],
+  },
+  {
+    name: "Hobby",
     tags: [],
   },
 ];
@@ -140,16 +153,18 @@ function init() {
     });
   }
   document.getElementById("send").addEventListener("click", sendMessage);
-  initLabels();
+  if(initialLoad){
+    initialLoad = false;
+    initLabels();
+  }
 }
 
 // INITIALIZE LABELS
 function initLabels() {
   let labelContainer = document.getElementById("label-list");
-  let counter = 0;
+  labelContainer.innerHTML = "";
 
   for (label of allLabels) {
-    console.log(counter);
     let labelDiv = document.createElement("div");
     labelDiv.className = "label";
     labelDiv.onclick = onLabelClick;
@@ -161,7 +176,6 @@ function initLabels() {
 
     labelDiv.appendChild(labelText);
     labelContainer.appendChild(labelDiv);
-    counter++;
   }
 
   // ADD EVENTLISTENER TO LABELS
@@ -170,12 +184,41 @@ function initLabels() {
   for (label of labels) {
     label.addEventListener("click", function () {
       let current = document.getElementById("label-list").getElementsByClassName("active");
-      current[0].className = current[0].className.replace(" active", "");
-      this.className += " active";
+      if(current =! this){
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      }
     });
   }
+  labels[0].className += " active"; 
+}
 
-  labels[0].className += " active";
+// SORT CHATS BY LABEL
+function onLabelClick() {
+  let tags = [];
+  let labelName;
+  // GET TAGS FOR CURRENT LABEL
+  for (let label of allLabels) {
+    if (label.name === this.id) {
+      tags = label.tags;
+      labelName = label.name;
+    }
+  }
+  document.getElementById("conversation-list").innerHTML = "";
+  for (chat of allChats) {
+    if (labelName === "All Messages") {
+      createConversation(chat.name, chat.image, chat.ID);
+    } else if (chat.label === labelName) {
+      createConversation(chat.name, chat.image, chat.ID);
+    }
+  }
+
+  let current = document.getElementById("label-list").getElementsByClassName("active");
+  if(current[0].id !== this.id){
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  }
+  init();
 }
 
 function sendMessage() {
@@ -338,37 +381,17 @@ function addLabel() {
   });
 }
 
-// SORT CHATS BY LABEL
-function onLabelClick() {
-  let tags = [];
-  let labelName;
-  // GET TAGS FOR CURRENT LABEL
-  for (let label of allLabels) {
-    if (label.name === this.id) {
-      tags = label.tags;
-      labelName = label.name;
-    }
-  }
-  document.getElementById("conversation-list").innerHTML = "";
-  for (chat of allChats) {
-    if (labelName === "All Messages") {
-      createConversation(chat.name, chat.image, chat.ID);
-    } else if (chat.label === labelName) {
-      createConversation(chat.name, chat.image, chat.ID);
-    }
-  }
-  init();
-}
-
 function toggleNewLabel() {
   let icon = document.getElementById("newLabelIcon");
   let background = document.getElementById("newLabel");
   if (document.getElementById("newLabelForm").style.display === "none") {
     document.getElementById("newLabelForm").style.display = "block";
+    document.getElementById("newLabelConfirm").style.display = "block";
     icon.className = "newLabelIconRotated";
     background.style = "background-color: red;";
   } else {
     document.getElementById("newLabelForm").style.display = "none";
+    document.getElementById("newLabelConfirm").style.display = "none";
     icon.className = "";
     background.style = "background-color: white;";
   }
@@ -395,6 +418,12 @@ function createNewLabel() {
       },
     }),
   });
+  updateLabels();
+}
+
+function updateLabels() {
+  getLabels();
+  console.log(allLabels);
 }
 
 // TODO:

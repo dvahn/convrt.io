@@ -94,7 +94,7 @@ body {
   padding: 0 15px;
 
   display: grid;
-  grid: 40px/40px 1fr;
+  grid: 40px/40px 1fr 40px;
   align-content: center;
 }
 
@@ -327,7 +327,7 @@ body {
 }
 
 .newLabelFormInput {
-  width: 80%;
+  width: 90%;
   padding-left: 5%;
   margin-left: 5%;
   margin-right: 5%;

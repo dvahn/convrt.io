@@ -50,7 +50,10 @@
         <a id="newLabel" href="#" onclick="toggleNewLabel()"> <img id="newLabelIcon" src="./images/add.svg" /> </a>
         <!-- <a id="refresh" class="refresh" href="#">R</a> -->
         <div id="newLabelForm" style="display: none">
-          <input class="newLabelFormInput" placeholder="New Label" />
+          <input id="newLabelInput" class="newLabelFormInput" placeholder="New Label" />
+        </div>
+        <div id="newLabelConfirm" style="display: none">
+          <a onclick="createNewLabel()">+</a>
         </div>
       </div>
       <div id="chat-title">
