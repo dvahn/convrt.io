@@ -24,7 +24,6 @@ xpath = {
     "only_message": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div/p"
 }
 
-
 driver = ChromeBrowser()
 
 # start with message thread

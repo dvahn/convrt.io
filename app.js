@@ -8,13 +8,14 @@ const port = process.env.PORT || 3000;
 
 const express = require("express");
 const { PythonShell } = require("python-shell");
+const { connect } = require("http2");
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded());
 app.use(express.json());
 
 const mongoClient = mongo.MongoClient;
-const url = "mongodb://localhost:27017/convrt";
+const url = "mongodb://mongo:27017/convrt";
 
 let data = [];
 let messageFeeds = [];
@@ -22,6 +23,7 @@ let labels = [];
 
 function updateAPI() {
   mongoClient.connect(url, (err, db) => {
+    console.log("Connected!");
     let dbo = db.db("convrt_database");
     dbo
       .collection("conversations")
@@ -54,7 +56,7 @@ function updateAPI() {
 
 app.get("/", (req, res) => {
   updateAPI();
-  res.sendFile("/Users/daniel/Documents/Master/ChatBot Projekt/convrt/public/chat.html");
+  res.sendFile("public/chat.html", { root: __dirname });
 });
 
 app.get("/api/conversations", (req, res) => {
