@@ -1,18 +1,13 @@
 #!/bin/bash
-function downloadchrome {
-  version="87.0.4280.20"
-  download_location="https://chromedriver.storage.googleapis.com/$version/chromedriver_linux64.zip"
-  rm /tmp/chromedriver_linux64.zip
-  wget -P /tmp $download_location
-  unzip /tmp/chromedriver_linux64.zip -d .
-  mv ./chromedriver ./Backend/chromedriver_linux
-  chmod u+x ./Backend/chromedriver_linux
-}
-downloadchrome
-
-./chromedriver_linux --args --profile-directory="Default" &
+apt update
+yes | apt install python3-pip
+# apt-get install python3-pip
+cd Backend
+pip3 install selenium
+python3 -m pip install pymongo==3.5.1
+cd ..
 python Backend/clearDB.py
-python3 Backend/crawl.py
-kill $( pgrep -fl Backend/chromedriver | awk '{print $1}')
+python3 Backend/crawl.py >crawl_output.txt &
+# kill $( pgrep -fl Backend/chromedriver | awk '{print $1}')
 
 npm run dev

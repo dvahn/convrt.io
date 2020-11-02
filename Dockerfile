@@ -17,6 +17,7 @@ FROM python:3
 COPY . .
 
 RUN chmod +x Backend/setup.sh
+RUN pip3 install selenium
 
 
 FROM node:12

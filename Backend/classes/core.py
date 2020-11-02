@@ -39,22 +39,40 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
         self.MAX_WAIT = int(self.config.get('GENERAL', 'max_wait'))
 
         if self.mode == "REMOTE":
-            executor = "http://"
-            self.config.get('REMOTE', 'host') + ":4444/wd/hub"
+            executor = "http://" + \
+                self.config.get('REMOTE', 'host') + ":4444/wd/hub"
             exec_path_chrome = self.config.get('REMOTE', 'exec_path_chrome')
             options = webdriver.ChromeOptions()  # Chrome Options
             # Extract this path from "chrome://version/"
             options.add_argument("--user-data-dir=" + exec_path_chrome)
             options.add_argument("--profile-directory=" + self.profile)
-            options.add_argument("--window-size=700,1000 ")
+            options.add_argument("--window-size=0,0 ")
             options.add_argument("--window-position=800,0")
             # LEARNING: headless necessary in remote mode
             # options.add_argument("--headless")
-            # options.add_argument("--no-sandbox")
+            options.add_argument("--no-sandbox")
             # options.add_argument("--disable-dev-shm-usage")
             # options.add_argument("--disable-gpu")
             self = webdriver.Remote.__init__(
                 self, command_executor=executor, desired_capabilities=options.to_capabilities())
+
+        # if self.mode == "REMOTE":
+        #     executor = "http://"
+        #     self.config.get('REMOTE', 'host') + ":4444/wd/hub"
+        #     exec_path_chrome = self.config.get('REMOTE', 'exec_path_chrome')
+        #     options = webdriver.ChromeOptions()  # Chrome Options
+        #     # Extract this path from "chrome://version/"
+        #     options.add_argument("--user-data-dir=" + exec_path_chrome)
+        #     options.add_argument("--profile-directory=" + self.profile)
+        #     options.add_argument("--window-size=700,1000 ")
+        #     options.add_argument("--window-position=800,0")
+        #     # LEARNING: headless necessary in remote mode
+        #     # options.add_argument("--headless")
+        #     # options.add_argument("--no-sandbox")
+        #     # options.add_argument("--disable-dev-shm-usage")
+        #     # options.add_argument("--disable-gpu")
+        #     self = webdriver.Remote.__init__(
+        #         self, command_executor=executor, desired_capabilities=options.to_capabilities())
 
             # self = webdriver.Remote.__init__(self, command_executor="http://127.0.0.1:4444/wd/hub", desired_capabilities=options.to_capabilities())
 
