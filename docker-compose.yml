@@ -25,7 +25,6 @@ services:
     ports:
       - "4444:4444"
     environment:
-      EXTERNAL_IP: 192.168.0.199
       GRID_MAX_SESSION: 16
       GRID_BROWSER_TIMEOUT: 3000
       GRID_TIMEOUT: 3000

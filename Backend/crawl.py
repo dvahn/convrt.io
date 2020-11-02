@@ -27,69 +27,69 @@ xpath = {
 driver = ChromeBrowser()
 
 # start with message thread
+# driver.get("https://www.google.com")
 driver.get("https://www.linkedin.com/messaging/thread/6689474692790685696/")
-# TODO: start with first entry (not hardcoded ID)
+# # TODO: start with first entry (not hardcoded ID)
 
-# LEARNING: wait until DOM is build up in browser
-driver.wait()
+# # LEARNING: wait until DOM is build up in browser
+# driver.wait()
 
+# for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
-for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
+#     # get id from DOM
+#     id_container = driver.find_element_by_xpath(
+#         xpath["id_container"].format(pos=i))
+#     id = id_container.get_attribute("href").split("/")[5]
 
-    # get id from DOM
-    id_container = driver.find_element_by_xpath(
-        xpath["id_container"].format(pos=i))
-    id = id_container.get_attribute("href").split("/")[5]
+#     # call next conversation
+#     driver.get("https://www.linkedin.com/messaging/thread/"+id+"/")
+#     driver.wait()
 
-    # call next conversation
-    driver.get("https://www.linkedin.com/messaging/thread/"+id+"/")
-    driver.wait()
+#     # get name from DOM
+#     name = driver.get_text_from_xpath(xpath["name"].format(pos=i))
+#     print(id, name)
 
-    # get name from DOM
-    name = driver.get_text_from_xpath(xpath["name"].format(pos=i))
-    print(id, name)
+#     # get image from DOM
+#     image = driver.find_element_by_xpath(xpath["image"].format(pos=1))
+#     image_src = image.get_attribute("src")
 
-    # get image from DOM
-    image = driver.find_element_by_xpath(xpath["image"].format(pos=1))
-    image_src = image.get_attribute("src")
+#     # add name + id to conversation collection
+#     new = {"name": name, "ID": id, "image": image_src, "label": ""}
+#     conversations.insert_one(new)
 
-    # add name + id to conversation collection
-    new = {"name": name, "ID": id, "image": image_src, "label": ""}
-    conversations.insert_one(new)
+#     # create collection for currently scraped conversation
+#     current_col = db[id]
 
-    # create collection for currently scraped conversation
-    current_col = db[id]
+#     lastSender = ""
+#     lastTime = ""
 
-    lastSender = ""
-    lastTime = ""
+#     for i in range(3, driver.get_elements_size(xpath["number_messages"])+1):
 
-    for i in range(3, driver.get_elements_size(xpath["number_messages"])+1):
+#         try:
+#             sender = driver.get_text_from_xpath(xpath["sender"].format(pos=i))
+#             time = driver.get_text_from_xpath(xpath["time"].format(pos=i))
+#             message_content = driver.get_text_from_xpath(
+#                 xpath["message"].format(pos=i))
 
-        try:
-            sender = driver.get_text_from_xpath(xpath["sender"].format(pos=i))
-            time = driver.get_text_from_xpath(xpath["time"].format(pos=i))
-            message_content = driver.get_text_from_xpath(
-                xpath["message"].format(pos=i))
+#             lastSender = sender
+#             lastTime = time
 
-            lastSender = sender
-            lastTime = time
+#             message = {
+#                 "sender": sender,
+#                 "time": time,
+#                 "content": message_content
+#             }
 
-            message = {
-                "sender": sender,
-                "time": time,
-                "content": message_content
-            }
+#         except:
+#             message = {
+#                 "sender": lastSender,
+#                 "time": lastTime,
+#                 "content": driver.get_text_from_xpath(
+#                     xpath["only_message"].format(pos=i))
+#             }
 
-        except:
-            message = {
-                "sender": lastSender,
-                "time": lastTime,
-                "content": driver.get_text_from_xpath(
-                    xpath["only_message"].format(pos=i))
-            }
+#         print(message, "\n")
+#         # insert single message to collection of currently scraped conversation
+#         current_col.insert_one(message)
 
-        print(message, "\n")
-        # insert single message to collection of currently scraped conversation
-        current_col.insert_one(message)
-
-driver.close()
+# driver.close()
