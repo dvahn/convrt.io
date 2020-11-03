@@ -5,7 +5,7 @@ import pymongo
 import sys
 
 ## Create database ##
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client['convrt_database']
 conversations = db['conversations']
 
@@ -15,7 +15,7 @@ xpath = {
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
-    "image": "//li[{pos}]/div/div/a/div/div/img",
+    "image": "//li[{pos}]/div/a/div[1]/div[1]/img",
     "number_messages": "//div/div/div[2]/div[4]/div/ul/li",
     # TODO: xpath for day
     "sender": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[1]/a/span",
@@ -27,9 +27,10 @@ xpath = {
 driver = ChromeBrowser()
 
 # start with message thread
-# driver.get("https://www.google.com")
 driver.get("https://www.linkedin.com/messaging/")
-# TODO: start with first entry (not hardcoded ID)
+id_of_first_conversation = driver.current_url.split('/')[-2]
+driver.get("https://www.linkedin.com/messaging/thread/" +
+           id_of_first_conversation)
 
 # LEARNING: wait until DOM is build up in browser
 driver.wait()
@@ -47,7 +48,6 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
     # get name from DOM
     name = driver.get_text_from_xpath(xpath["name"].format(pos=i))
-    print(id, name)
 
     # get image from DOM
     image = driver.find_element_by_xpath(xpath["image"].format(pos=1))
@@ -88,7 +88,6 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
                     xpath["only_message"].format(pos=i))
             }
 
-        print(message, "\n")
         # insert single message to collection of currently scraped conversation
         current_col.insert_one(message)
 

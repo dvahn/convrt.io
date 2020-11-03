@@ -46,8 +46,8 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
             # Extract this path from "chrome://version/"
             options.add_argument("--user-data-dir=" + exec_path_chrome)
             options.add_argument("--profile-directory=" + self.profile)
-            options.add_argument("--window-size=0,0 ")
-            options.add_argument("--window-position=800,0")
+            options.add_argument("--window-size=1024,768")
+            options.add_argument("--window-position=0,0")
             # LEARNING: headless necessary in remote mode
             # options.add_argument("--headless")
             options.add_argument("--no-sandbox")
