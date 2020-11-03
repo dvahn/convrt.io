@@ -50,7 +50,7 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
     name = driver.get_text_from_xpath(xpath["name"].format(pos=i))
 
     # get image from DOM
-    image = driver.find_element_by_xpath(xpath["image"].format(pos=1))
+    image = driver.find_element_by_xpath(xpath["image"].format(pos=i))
     image_src = image.get_attribute("src")
 
     # add name + id to conversation collection
