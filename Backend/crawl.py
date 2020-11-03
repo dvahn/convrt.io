@@ -15,7 +15,7 @@ xpath = {
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
-    "image": "//li[{pos}]/div/a/div[{pos}]/div[{pos}]/img",
+    "image": "//li[{pos}]/div/a/div[1]/div[1]/img",
     "number_messages": "//div/div/div[2]/div[4]/div/ul/li",
     # TODO: xpath for day
     "sender": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[1]/a/span",
@@ -23,7 +23,6 @@ xpath = {
     "message": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div[2]/p",
     "only_message": "//div/div/div[2]/div[4]/div/ul/li[{pos}]/div/div/p"
 }
-
 
 driver = ChromeBrowser()
 
@@ -52,7 +51,7 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
     print(id, name)
 
     # get image from DOM
-    image = driver.find_element_by_xpath(xpath["image"].format(pos=1))
+    image = driver.find_element_by_xpath(xpath["image"].format(pos=i))
     image_src = image.get_attribute("src")
 
     # add name + id to conversation collection
