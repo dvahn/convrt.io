@@ -28,8 +28,10 @@ xpath = {
 driver = ChromeBrowser()
 
 # start with message thread
-driver.get("https://www.linkedin.com/messaging/thread/6727927852131471360/")
-# TODO: start with first entry (not hardcoded ID)
+driver.get("https://www.linkedin.com/messaging/")
+id_of_first_conversation = driver.current_url.split('/')[-2]
+driver.get("https://www.linkedin.com/messaging/thread/" +
+           id_of_first_conversation)
 
 # LEARNING: wait until DOM is build up in browser
 driver.wait()
