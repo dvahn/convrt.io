@@ -4,10 +4,13 @@ Convrt.io is an alternative chatting interface for the messenger provided by Lin
 
 ## Running the project
 
-Just clone the repo and run:
+After cloning the repo, insert the path of your Chrome-profile-folder (e.g. /Users/[USERNAME]/Library/Application Support/Google/Chrome/Default) into the docker-compose.yml at services/chrome/volumes.
+Then run:
 
 `docker-compose build`
 
 and
 
 `docker-compose up`
+
+After that, CONVRT should be available at localhost:3000.
