@@ -405,6 +405,8 @@ function createNewLabel() {
   let newLabelName = document.getElementById("newLabelInput").value;
   let newLabelTags = [];
 
+  console.log(newLabelName);
+
   fetch("/", {
     method: "POST",
     headers: {
@@ -418,14 +420,21 @@ function createNewLabel() {
       },
     }),
   });
+  allLabels.push({ 
+    name: newLabelName,
+    tags: newLabelTags
+  });
+  toggleNewLabel();
   updateLabels();
 }
 
 function updateLabels() {
   getLabels();
+  // initLabels();
   console.log(allLabels);
 }
 
 // TODO:
 // - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
 // - implement search functionality
+// - make DB entries persistent (docker-compose.yml ==> mongo/volumes )

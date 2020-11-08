@@ -4,8 +4,10 @@ Convrt.io is an alternative chatting interface for the messenger provided by Lin
 
 ## Running the project
 
-After cloning the repo, insert the path of your Chrome-profile-folder (e.g. /Users/[USERNAME]/Library/Application Support/Google/Chrome/Default) into the docker-compose.yml at services/chrome/volumes.
-Then run:
+After cloning the repo you have to change Backend/classes/crawl.config. In line 9 of the file the name of your chrome
+profile should be defined. This is important for loading your personal cookies into the application.
+
+After updating crawl.config, run:
 
 `docker-compose build`
 

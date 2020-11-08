@@ -23,7 +23,6 @@ let labels = [];
 
 function updateAPI() {
   mongoClient.connect(url, (err, db) => {
-    console.log("Connected!");
     let dbo = db.db("convrt_database");
     dbo
       .collection("conversations")
@@ -62,21 +61,18 @@ app.get("/", (req, res) => {
 app.get("/api/conversations", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  // TODO: CLEAR PAGE
   res.send(JSON.stringify(data));
 });
 
 app.get("/api/messageFeeds", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  // TODO: CLEAR PAGE
   res.send(JSON.stringify(messageFeeds));
 });
 
 app.get("/api/labels", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  // TODO: CLEAR PAGE
   res.send(JSON.stringify(labels));
 });
 
@@ -105,11 +101,14 @@ app.post("/", function (req, res) {
     });
   } else if (type === "refresh") {
     console.log("refresh");
+    //
+    // WORK IN PROGRESS ! 
+    //
     // call python scraping script
     let options = {
       pythonPath: "/usr/bin/python3",
       // make sure you use an absolute path for scriptPath
-      scriptPath: "/Users/daniel/Documents/Master/ChatBot Projekt/convrt/Backend/",
+      scriptPath: "/convrt/Backend/",
     };
 
     PythonShell.run("crawl.py", options, function (err, results) {
@@ -130,7 +129,6 @@ app.post("/", function (req, res) {
       });
     });
   } else if (type === "createdLabel") {
-    // TODO: add labels to DB
     mongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("convrt_database");
