@@ -9,9 +9,16 @@ client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client['convrt_database']
 conversations = db['conversations']
 
+# User Credentials
+username = sys.argv[1]
+password = sys.argv[2]
+
 # XPATH
 xpath = {
     # changes irregularly! (daily?)
+    "login_user": "/html/body/div/main/div[3]/form/div[1]/input",
+    "login_password": "/html/body/div/main/div[3]/form/div[2]/input",
+    "login_button": "/html/body/div/main/div[3]/form/div[3]/button",
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
@@ -25,6 +32,26 @@ xpath = {
 }
 
 driver = ChromeBrowser()
+
+
+
+try:
+
+    driver.get("https://www.linkedin.com/login")
+    login_input = driver.find_element_by_xpath(xpath["login_user"])
+    login_input.send_keys(username)
+
+    login_password = driver.find_element_by_xpath(xpath["login_password"])
+    login_password.send_keys(password)
+
+    login_button = driver.find_element_by_xpath(xpath["login_button"])
+    login_button.click()
+
+    driver.wait()
+
+except NoSuchElementException:
+    print("Already logged in!")
+
 
 # start with message thread
 driver.get("https://www.linkedin.com/messaging/")

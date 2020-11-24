@@ -4,15 +4,12 @@ Convrt.io is an alternative chatting interface for the messenger provided by Lin
 
 ## Running the project
 
-After cloning the repo you have to change Backend/classes/crawl.config. In line 9 of the file the name of your chrome
-profile should be defined. This is important for loading your personal cookies into the application.
+Simply run:
 
-After updating crawl.config, run:
+`chmod +x bash convrt.sh`
 
-`docker-compose build`
+and afterwards:
 
-and
+`bash convrt.sh <YOUR MAIL ADDRESS> <YOUR LINKEDIN PASSWORD>`
 
-`docker-compose up`
-
-After that, CONVRT should be available at localhost:3000.
+After running through the setup, which can take up to a few minutes, CONVRT should be available at localhost:3000.
