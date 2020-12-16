@@ -17,6 +17,8 @@ app.use(express.json());
 const mongoClient = mongo.MongoClient;
 const url = "mongodb://mongo:27017/convrt";
 
+let loggedIn = false;
+
 let data = [];
 let messageFeeds = [];
 let labels = [];
@@ -42,16 +44,30 @@ function updateAPI() {
             });
         }
       });
-    console.log(messageFeeds);
     dbo
       .collection("labels")
       .find({}, { projection: { _id: 0, name: 1, tags: 1 } })
       .toArray((err, result) => {
         labels = result;
       });
-    console.log(labels);
   });
 }
+
+// app.get("/", (req, res) => {
+//   res.sendFile("public/login.html", { root: __dirname });
+// });
+
+// app.post("/", function (req, res) {
+//   console.log(loggedIn);
+//   let user = req.body.message.user;
+//   let password = req.body.message.password;
+//   console.log(user, password);
+
+//   // call setup.sh with user credentials
+//   // wait for process to finish
+//   // then set loggedIn to true and reload page
+
+// });
 
 app.get("/", (req, res) => {
   updateAPI();
@@ -102,7 +118,7 @@ app.post("/", function (req, res) {
   } else if (type === "refresh") {
     console.log("refresh");
     //
-    // WORK IN PROGRESS ! 
+    // WORK IN PROGRESS !
     //
     // call python scraping script
     let options = {
