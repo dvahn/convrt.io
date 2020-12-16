@@ -6,13 +6,15 @@
     <link rel="stylesheet" type="text/css" media="screen" href="./css/styles.css" />
   </head>
   <body>
-    <div id="loginOverlay" style="">
+    <div id="loginOverlay">
       <div id="loginForm">
-        <input id="username">
-        <br>
-        <input id="password">
-        <br>
-        <button onclick="login()">LOGIN</button>
+        <div class="loginComponents" id="loginComponents">
+          <input class="loginInput" id="username">
+          <br>
+          <input type="password" class="loginInput" id="password">
+          <br>
+          <button class="loginButton" onclick="login()">LOGIN</button>
+        </div>
       </div>
     </div>
     <div id="chat-container" style="display: none;">

@@ -7,6 +7,7 @@ const hostname = "127.0.0.1";
 const port = process.env.PORT || 3000;
 
 const express = require("express");
+const exec = require("child_process").exec;
 const { PythonShell } = require("python-shell");
 const { connect } = require("http2");
 const app = express();
@@ -102,7 +103,7 @@ app.post("/", function (req, res) {
   } else if (type === "refresh") {
     console.log("refresh");
     //
-    // WORK IN PROGRESS ! 
+    // WORK IN PROGRESS !
     //
     // call python scraping script
     let options = {
@@ -138,6 +139,36 @@ app.post("/", function (req, res) {
         db.close();
       });
     });
+  } else if (type === "login") {
+    let user = req.body.message.user;
+    user = String(user);
+    let password = req.body.message.password;
+    console.log(user, password);
+    exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
+      if (err) {
+        //some error occurred
+        console.error(err);
+      } else {
+        // the *entire* stdout and stderr (buffered)
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      }
+    });
+
+    // TODO:
+    //
+    // Write loggedIn Status to DB and push to API
+
+    // mongoClient.connect(url, (err, db) => {
+    //   if (err) throw err;
+    //   let dbo = db.db("convrt_database");
+    //   let status = { status: true };
+    //   dbo.collection("loggedInStatus").updateOne(status, function (err, res) {
+    //     if (err) throw err;
+    //     db.close();
+    //   });
+    // });
+    // location.reload();
   } else {
     console.log("Unknown type!");
   }

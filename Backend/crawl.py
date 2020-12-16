@@ -34,7 +34,6 @@ xpath = {
 driver = ChromeBrowser()
 
 
-
 try:
 
     driver.get("https://www.linkedin.com/login")
@@ -117,5 +116,11 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
         # insert single message to collection of currently scraped conversation
         current_col.insert_one(message)
+
+# check for empty collections
+for collection in db:
+    if db[collection].count() == 0:
+        db[collection].drop()
+
 
 driver.close()

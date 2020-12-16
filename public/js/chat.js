@@ -1,4 +1,5 @@
 let initialLoad = true;
+let loggedIn = false;
 let allChats = [];
 let allLabels = [
   {
@@ -24,16 +25,26 @@ let persons = [];
 fetch("http://127.0.0.1:3000/api/conversations")
   .then((res) => res.json())
   .then((data) => {
-    persons = data;
-    for (person of persons) {
-      allChats.push(person);
-      createConversation(person.name, person.image, person.ID);
+    if (data) {
+      persons = data;
+      for (person of persons) {
+        allChats.push(person);
+        createConversation(person.name, person.image, person.ID);
+      }
+      console.log(allChats);
+      getLabels();
+      init();
     }
-    console.log(allChats);
-    getLabels();
-    init();
   })
   .catch((error) => console.log(error));
+
+if (loggedIn) {
+  document.getElementById("loginOverlay").style.display = "none";
+  document.getElementById("chat-container").style.display = "";
+} else {
+  document.getElementById("loginOverlay").style.display = "";
+  document.getElementById("chat-container").style.display = "none";
+}
 
 // SET UP CONVERSATIONS
 function createConversation(name, image, id) {
@@ -153,7 +164,7 @@ function init() {
     });
   }
   document.getElementById("send").addEventListener("click", sendMessage);
-  if(initialLoad){
+  if (initialLoad) {
     initialLoad = false;
     initLabels();
   }
@@ -184,13 +195,13 @@ function initLabels() {
   for (label of labels) {
     label.addEventListener("click", function () {
       let current = document.getElementById("label-list").getElementsByClassName("active");
-      if(current =! this){
+      if ((current = !this)) {
         current[0].className = current[0].className.replace(" active", "");
         this.className += " active";
       }
     });
   }
-  labels[0].className += " active"; 
+  labels[0].className += " active";
 }
 
 // SORT CHATS BY LABEL
@@ -214,7 +225,7 @@ function onLabelClick() {
   }
 
   let current = document.getElementById("label-list").getElementsByClassName("active");
-  if(current[0].id !== this.id){
+  if (current[0].id !== this.id) {
     current[0].className = current[0].className.replace(" active", "");
     this.className += " active";
   }
@@ -420,9 +431,9 @@ function createNewLabel() {
       },
     }),
   });
-  allLabels.push({ 
+  allLabels.push({
     name: newLabelName,
-    tags: newLabelTags
+    tags: newLabelTags,
   });
   toggleNewLabel();
   updateLabels();
@@ -432,6 +443,30 @@ function updateLabels() {
   getLabels();
   // initLabels();
   console.log(allLabels);
+}
+
+function login() {
+  let user = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+
+  loggedIn = true;
+
+  document.getElementById("loginOverlay").style.display = "none";
+  document.getElementById("chat-container").style.display = "";
+
+  fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: {
+        type: "login",
+        user: user,
+        password: password,
+      },
+    }),
+  });
 }
 
 // TODO:
