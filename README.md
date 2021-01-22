@@ -2,25 +2,15 @@
 
 Convrt.io is an alternative chatting interface for the messenger provided by LinkedIn. Along with a well arranged design, convrt.io offers the possibility to sort your different contacts via a labeling functionality. The long-term goal is to implement an intelligent assistant, which helps the user organizing his messaging as well as his appointment scheduling.
 
-## Prerequisites
-
-- node.js
-- express.js
-- mongoDB
-- python 3.x
-
 ## Running the project
 
-### Setup
+Simply run:
 
-From the project folder simply run:
-`npm run setup`
+`chmod +x bash convrt.sh`
 
-This will automatically erase all data from the database and crawl it freshly from your LinkedIn messenger feed.
+and afterwards:
 
-### Running the chat
+`bash convrt.sh`
 
-Go into your project folder and run:
-`npm run dev`
-
-You should be able to access the chat frontend on localhost:3000.
+After running through the setup, which can take up to a few minutes, CONVRT should be available at localhost:3000. Enter your LinkedIn Credentials and wait for convrt
+to transfer your conversations.

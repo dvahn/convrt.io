@@ -5,13 +5,21 @@ import pymongo
 import sys
 
 ## Create database ##
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client['convrt_database']
 conversations = db['conversations']
+
+# User Credentials
+if len(sys.argv) > 0:
+    username = sys.argv[1]
+    password = sys.argv[2]
 
 # XPATH
 xpath = {
     # changes irregularly! (daily?)
+    "login_user": "/html/body/div/main/div[3]/form/div[1]/input",
+    "login_password": "/html/body/div/main/div[3]/form/div[2]/input",
+    "login_button": "/html/body/div/main/div[3]/form/div[3]/button",
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
@@ -26,6 +34,25 @@ xpath = {
 
 driver = ChromeBrowser()
 
+
+try:
+
+    driver.get("https://www.linkedin.com/login")
+    login_input = driver.find_element_by_xpath(xpath["login_user"])
+    login_input.send_keys(username)
+
+    login_password = driver.find_element_by_xpath(xpath["login_password"])
+    login_password.send_keys(password)
+
+    login_button = driver.find_element_by_xpath(xpath["login_button"])
+    login_button.click()
+
+    driver.wait()
+
+except NoSuchElementException:
+    print("Already logged in!")
+
+
 # start with message thread
 driver.get("https://www.linkedin.com/messaging/")
 id_of_first_conversation = driver.current_url.split('/')[-2]
@@ -34,7 +61,11 @@ driver.get("https://www.linkedin.com/messaging/thread/" +
 
 # LEARNING: wait until DOM is build up in browser
 driver.wait()
+<<<<<<< HEAD
 print(driver.get_elements_size(xpath["number_conversations"]))
+=======
+
+>>>>>>> dockerized
 for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
     # get id from DOM
@@ -48,7 +79,6 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
     # get name from DOM
     name = driver.get_text_from_xpath(xpath["name"].format(pos=i))
-    print(id, name)
 
     # get image from DOM
     image = driver.find_element_by_xpath(xpath["image"].format(pos=i))
@@ -89,8 +119,12 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
                     xpath["only_message"].format(pos=i))
             }
 
-        print(message, "\n")
         # insert single message to collection of currently scraped conversation
         current_col.insert_one(message)
 
-driver.close()
+# # check for empty collections
+# for collection in db:
+#     if db[collection].count() == 0:
+#         db[collection].drop()
+
+driver.quit()

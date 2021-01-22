@@ -1,4 +1,5 @@
 let initialLoad = true;
+let loggedIn = false;
 let allChats = [];
 let allLabels = [
   {
@@ -24,16 +25,26 @@ let persons = [];
 fetch("http://127.0.0.1:3000/api/conversations")
   .then((res) => res.json())
   .then((data) => {
-    persons = data;
-    for (person of persons) {
-      allChats.push(person);
-      createConversation(person.name, person.image, person.ID);
+    if (data) {
+      persons = data;
+      for (person of persons) {
+        allChats.push(person);
+        createConversation(person.name, person.image, person.ID);
+      }
+      console.log(allChats);
+      getLabels();
+      init();
     }
-    console.log(allChats);
-    getLabels();
-    init();
   })
   .catch((error) => console.log(error));
+
+if (loggedIn) {
+  document.getElementById("loginOverlay").style.display = "none";
+  document.getElementById("chat-container").style.display = "";
+} else {
+  document.getElementById("loginOverlay").style.display = "";
+  document.getElementById("chat-container").style.display = "none";
+}
 
 // SET UP CONVERSATIONS
 function createConversation(name, image, id) {
@@ -153,7 +164,7 @@ function init() {
     });
   }
   document.getElementById("send").addEventListener("click", sendMessage);
-  if(initialLoad){
+  if (initialLoad) {
     initialLoad = false;
     initLabels();
   }
@@ -184,13 +195,13 @@ function initLabels() {
   for (label of labels) {
     label.addEventListener("click", function () {
       let current = document.getElementById("label-list").getElementsByClassName("active");
-      if(current =! this){
+      if ((current = !this)) {
         current[0].className = current[0].className.replace(" active", "");
         this.className += " active";
       }
     });
   }
-  labels[0].className += " active"; 
+  labels[0].className += " active";
 }
 
 // SORT CHATS BY LABEL
@@ -214,7 +225,7 @@ function onLabelClick() {
   }
 
   let current = document.getElementById("label-list").getElementsByClassName("active");
-  if(current[0].id !== this.id){
+  if (current[0].id !== this.id) {
     current[0].className = current[0].className.replace(" active", "");
     this.className += " active";
   }
@@ -258,7 +269,7 @@ function sendMessage() {
     yourMessage.appendChild(contentDiv);
     messageList.insertBefore(yourMessage, messageList.firstChild);
 
-    fetch("/", {
+    fetch("/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -310,14 +321,14 @@ function getDate() {
 
 // SEND ON ENTER (maybe more shortcuts? (new Label e.g.))
 document.getElementById("textInput").addEventListener("keydown", function (e) {
-  if (e.keyCode === 13) {
+  if (e === 13) {
     sendMessage();
   }
 });
 
 document.getElementById("refresh").addEventListener("click", function () {
   console.log("Clicked REFRESH");
-  fetch("/", {
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -366,7 +377,7 @@ function addLabel() {
       id = chat.ID;
     }
   }
-  fetch("/", {
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -405,7 +416,9 @@ function createNewLabel() {
   let newLabelName = document.getElementById("newLabelInput").value;
   let newLabelTags = [];
 
-  fetch("/", {
+  console.log(newLabelName);
+
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -418,14 +431,21 @@ function createNewLabel() {
       },
     }),
   });
+  allLabels.push({
+    name: newLabelName,
+    tags: newLabelTags,
+  });
+  toggleNewLabel();
   updateLabels();
 }
 
 function updateLabels() {
   getLabels();
+  // initLabels();
   console.log(allLabels);
 }
 
 // TODO:
 // - make convos deletable (popup, deleting convo from DOM-Tree, backup in DB)
 // - implement search functionality
+// - make DB entries persistent (docker-compose.yml ==> mongo/volumes )

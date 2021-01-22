@@ -33,49 +33,47 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
 
         self.config.readfp(open(settingsFilePath, "r"))
         self.mode = self.config.get('PROFILE', 'mode')
-        self.profile = self.config.get('PROFILE', 'name')
+        # self.profile = self.config.get('PROFILE', 'name')
 
         self.MIN_WAIT = int(self.config.get('GENERAL', 'min_wait'))
         self.MAX_WAIT = int(self.config.get('GENERAL', 'max_wait'))
 
         if self.mode == "REMOTE":
-            executor = "http://"
-            self.config.get('REMOTE', 'host') + ":4444/wd/hub"
+            executor = "http://" + \
+                self.config.get('REMOTE', 'host') + ":4444/wd/hub"
             exec_path_chrome = self.config.get('REMOTE', 'exec_path_chrome')
             options = webdriver.ChromeOptions()  # Chrome Options
             # Extract this path from "chrome://version/"
             options.add_argument("--user-data-dir=" + exec_path_chrome)
-            options.add_argument("--profile-directory=" + self.profile)
-            options.add_argument("--window-size=700,1000 ")
-            options.add_argument("--window-position=800,0")
+            # options.add_argument("--profile-directory=" + self.profile)
+            options.add_argument("--start-fullscreen")
+            options.add_argument("--window-position=0,0")
             # LEARNING: headless necessary in remote mode
             # options.add_argument("--headless")
-            # options.add_argument("--no-sandbox")
+            options.add_argument("--no-sandbox")
             # options.add_argument("--disable-dev-shm-usage")
             # options.add_argument("--disable-gpu")
             self = webdriver.Remote.__init__(
                 self, command_executor=executor, desired_capabilities=options.to_capabilities())
 
-            # self = webdriver.Remote.__init__(self, command_executor="http://127.0.0.1:4444/wd/hub", desired_capabilities=options.to_capabilities())
+        # if self.mode == "LOCAL":
 
-        if self.mode == "LOCAL":
+        #     exec_path_driver = self.config.get('LOCAL', 'exec_path_driver')
+        #     exec_path_chrome = self.config.get('LOCAL', 'exec_path_chrome')
 
-            exec_path_driver = self.config.get('LOCAL', 'exec_path_driver')
-            exec_path_chrome = self.config.get('LOCAL', 'exec_path_chrome')
-
-            options = webdriver.ChromeOptions()  # Chrome Options
-            # Extract this path from "chrome://version/"
-            options.add_argument("--user-data-dir=" + exec_path_chrome)
-            options.add_argument("--profile-directory=" + self.profile)
-            options.add_argument("--window-size=700,1000 ")
-            options.add_argument("--window-position=800,0")
-            # LEARNING: scrap following does not work when headless browser
-            # options.add_argument("--headless") # LEARNING: headless option yields wrong results for content
-            # options.add_argument("--no-sandbox")
-            # options.add_argument("--disable-dev-shm-usage")
-            # options.add_argument("--disable-gpu")
-            self = webdriver.Chrome.__init__(
-                self, executable_path=exec_path_driver, options=options)
+        #     options = webdriver.ChromeOptions()  # Chrome Options
+        #     # Extract this path from "chrome://version/"
+        #     options.add_argument("--user-data-dir=" + exec_path_chrome)
+        #     options.add_argument("--profile-directory=" + self.profile)
+        #     options.add_argument("--window-size=700,1000 ")
+        #     options.add_argument("--window-position=800,0")
+        #     # LEARNING: scrap following does not work when headless browser
+        #     # options.add_argument("--headless") # LEARNING: headless option yields wrong results for content
+        #     # options.add_argument("--no-sandbox")
+        #     # options.add_argument("--disable-dev-shm-usage")
+        #     # options.add_argument("--disable-gpu")
+        #     self = webdriver.Chrome.__init__(
+        #         self, executable_path=exec_path_driver, options=options)
 
     # wait randomly within MIN_MAX_WAIT frame
 
