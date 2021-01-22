@@ -1,15 +1,12 @@
-const http = require("http");
 const path = require("path");
-const fs = require("fs");
 const mongo = require("mongodb");
+const schedule = require("node-schedule");
 
-const hostname = "127.0.0.1";
 const port = process.env.PORT || 3000;
 
 const express = require("express");
 const exec = require("child_process").exec;
 const { PythonShell } = require("python-shell");
-const { connect } = require("http2");
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded());
@@ -21,6 +18,7 @@ const url = "mongodb://mongo:27017/convrt";
 let data = [];
 let messageFeeds = [];
 let labels = [];
+let loggedIn = false;
 
 function updateAPI() {
   mongoClient.connect(url, (err, db) => {
@@ -55,29 +53,49 @@ function updateAPI() {
 }
 
 app.get("/", (req, res) => {
-  updateAPI();
+  res.sendFile("public/login.html", { root: __dirname });
+});
+
+app.post("/", (req, res) => {
+  let user = req.body.username;
+  let password = req.body.password;
+  mongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("convrt_database");
+    let newUser = { email: user, password: password, loggedIn: true };
+    dbo.collection("userData").insertOne(newUser, function (err, res) {
+      if (err) throw err;
+      db.close();
+    });
+  });
+  let crawlScript = exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+    }
+  });
+  crawlScript.on("close", () => {
+    res.redirect("/chat");
+  });
+});
+
+app.get("/chat", (req, res) => {
+  // connect to DB, check if logged in
+  // if loggedIn == true, show chat page
+  mongoClient.connect(url, (err, db) => {
+    let dbo = db.db("convrt_database");
+    dbo.collection("userData").findOne({}, function (err, result) {
+      if (err) throw err;
+      loggedIn = result.loggedIn;
+    });
+  });
   res.sendFile("public/chat.html", { root: __dirname });
+  updateAPI();
 });
 
-app.get("/api/conversations", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(data));
-});
-
-app.get("/api/messageFeeds", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(messageFeeds));
-});
-
-app.get("/api/labels", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(labels));
-});
-
-app.post("/", function (req, res) {
+app.post("/chat", function (req, res) {
   let type = req.body.message.type;
   if (type === "message") {
     console.log(
@@ -101,24 +119,28 @@ app.post("/", function (req, res) {
       });
     });
   } else if (type === "refresh") {
-    console.log("refresh");
-    //
-    // WORK IN PROGRESS !
-    //
-    // call python scraping script
-    let options = {
-      pythonPath: "/usr/bin/python3",
-      // make sure you use an absolute path for scriptPath
-      scriptPath: "/convrt/Backend/",
-    };
-
-    PythonShell.run("crawl.py", options, function (err, results) {
-      if (err) throw err;
-      // results is an array consisting of messages collected during execution
-      console.log("results: %j", results);
+    let user;
+    let password;
+    mongoClient.connect(url, (err, db) => {
+      let dbo = db.db("convrt_database");
+      dbo
+        .collection("userData")
+        .find({}, { projection: { _id: 0, email: 1, password: 1, loggedIn: 0 } })
+        .toArray((err, result) => {
+          userData = result;
+          user = userData["email"];
+          user = userData["password"];
+        });
+    });
+    let crawlScript = exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      }
     });
   } else if (type === "addedLabel") {
-    // console.log("New Label!", req.body.message.label, req.body.message.id);
     mongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("convrt_database");
@@ -139,40 +161,45 @@ app.post("/", function (req, res) {
         db.close();
       });
     });
-  } else if (type === "login") {
-    let user = req.body.message.user;
-    user = String(user);
-    let password = req.body.message.password;
-    console.log(user, password);
-    exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
-      if (err) {
-        //some error occurred
-        console.error(err);
-      } else {
-        // the *entire* stdout and stderr (buffered)
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-      }
-    });
-
-    // TODO:
-    //
-    // Write loggedIn Status to DB and push to API
-
-    // mongoClient.connect(url, (err, db) => {
-    //   if (err) throw err;
-    //   let dbo = db.db("convrt_database");
-    //   let status = { status: true };
-    //   dbo.collection("loggedInStatus").updateOne(status, function (err, res) {
-    //     if (err) throw err;
-    //     db.close();
-    //   });
-    // });
-    // location.reload();
   } else {
     console.log("Unknown type!");
   }
   updateAPI();
+});
+
+// CRAWLING SCRIPT RIGHT BEFORE THAT!
+// Insert messages into LinkedIn every 5 minutes
+schedule.scheduleJob("*/5 * * * *", () => {
+  if (loggedIn) {
+    let syncScript = exec("bash synchronize.sh", (err, stdout, stderr) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      }
+    });
+  }
+});
+
+// API
+
+app.get("/api/conversations", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  res.send(JSON.stringify(data));
+});
+
+app.get("/api/messageFeeds", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  res.send(JSON.stringify(messageFeeds));
+});
+
+app.get("/api/labels", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  res.send(JSON.stringify(labels));
 });
 
 app.listen(port);
@@ -182,3 +209,4 @@ app.listen(port);
 // readme schreiben
 // python script vom Frontend callen
 // labels
+// syncronize on shutdown

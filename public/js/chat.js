@@ -269,7 +269,7 @@ function sendMessage() {
     yourMessage.appendChild(contentDiv);
     messageList.insertBefore(yourMessage, messageList.firstChild);
 
-    fetch("/", {
+    fetch("/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -321,14 +321,14 @@ function getDate() {
 
 // SEND ON ENTER (maybe more shortcuts? (new Label e.g.))
 document.getElementById("textInput").addEventListener("keydown", function (e) {
-  if (e.keyCode === 13) {
+  if (e === 13) {
     sendMessage();
   }
 });
 
 document.getElementById("refresh").addEventListener("click", function () {
   console.log("Clicked REFRESH");
-  fetch("/", {
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -377,7 +377,7 @@ function addLabel() {
       id = chat.ID;
     }
   }
-  fetch("/", {
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -418,7 +418,7 @@ function createNewLabel() {
 
   console.log(newLabelName);
 
-  fetch("/", {
+  fetch("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -443,30 +443,6 @@ function updateLabels() {
   getLabels();
   // initLabels();
   console.log(allLabels);
-}
-
-function login() {
-  let user = document.getElementById("username").value;
-  let password = document.getElementById("password").value;
-
-  loggedIn = true;
-
-  document.getElementById("loginOverlay").style.display = "none";
-  document.getElementById("chat-container").style.display = "";
-
-  fetch("/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: {
-        type: "login",
-        user: user,
-        password: password,
-      },
-    }),
-  });
 }
 
 // TODO:

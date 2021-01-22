@@ -10,8 +10,9 @@ db = client['convrt_database']
 conversations = db['conversations']
 
 # User Credentials
-username = sys.argv[1]
-password = sys.argv[2]
+if len(sys.argv) > 0:
+    username = sys.argv[1]
+    password = sys.argv[2]
 
 # XPATH
 xpath = {
@@ -117,10 +118,9 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
         # insert single message to collection of currently scraped conversation
         current_col.insert_one(message)
 
-# check for empty collections
-for collection in db:
-    if db[collection].count() == 0:
-        db[collection].drop()
+# # check for empty collections
+# for collection in db:
+#     if db[collection].count() == 0:
+#         db[collection].drop()
 
-
-driver.close()
+driver.quit()
