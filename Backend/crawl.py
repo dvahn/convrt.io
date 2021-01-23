@@ -61,11 +61,6 @@ driver.get("https://www.linkedin.com/messaging/thread/" +
 
 # LEARNING: wait until DOM is build up in browser
 driver.wait()
-<<<<<<< HEAD
-print(driver.get_elements_size(xpath["number_conversations"]))
-=======
-
->>>>>>> dockerized
 for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 
     # get id from DOM
