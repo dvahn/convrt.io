@@ -9,13 +9,14 @@
     <div id="loginOverlay">
         <form id="loginForm" action="/" method="POST">
           <div class="loginComponents" id="loginComponents">
-            <input class="loginInput" name="username">
+            <input id="username" class="loginInput" name="username" required>
             <br>
-            <input type="password" class="loginInput" name="password">
+            <input id="password" type="password" class="loginInput" name="password" required>
             <br>
-            <button type="submit" class="loginButton">LOGIN</button>
+            <button id="loginButton" type="submit" class="loginButton">LOGIN</button>
           </div>
         </form> 
     </div>
    </body>
+   <script src="./js/login.js"></script>
 </html>

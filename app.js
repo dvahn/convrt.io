@@ -6,7 +6,6 @@ const port = process.env.PORT || 3000;
 
 const express = require("express");
 const exec = require("child_process").exec;
-const { PythonShell } = require("python-shell");
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded());
@@ -59,21 +58,20 @@ app.get("/", (req, res) => {
 app.post("/", (req, res) => {
   let user = req.body.username;
   let password = req.body.password;
-  mongoClient.connect(url, (err, db) => {
-    if (err) throw err;
-    let dbo = db.db("convrt_database");
-    let newUser = { email: user, password: password, loggedIn: true };
-    dbo.collection("userData").insertOne(newUser, function (err, res) {
-      if (err) throw err;
-      db.close();
-    });
-  });
+
   let crawlScript = exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
     if (err) {
       console.error(err);
     } else {
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
+      mongoClient.connect(url, (err, db) => {
+        if (err) throw err;
+        let dbo = db.db("convrt_database");
+        let newUser = { email: user, password: password, loggedIn: true };
+        dbo.collection("userData").insertOne(newUser, function (err, res) {
+          if (err) throw err;
+          db.close();
+        });
+      });
     }
   });
   crawlScript.on("close", () => {
@@ -84,13 +82,13 @@ app.post("/", (req, res) => {
 app.get("/chat", (req, res) => {
   // connect to DB, check if logged in
   // if loggedIn == true, show chat page
-  mongoClient.connect(url, (err, db) => {
-    let dbo = db.db("convrt_database");
-    dbo.collection("userData").findOne({}, function (err, result) {
-      if (err) throw err;
-      loggedIn = result.loggedIn;
-    });
-  });
+  // mongoClient.connect(url, (err, db) => {
+  //   let dbo = db.db("convrt_database");
+  //   dbo.collection("userData").findOne({}, function (err, result) {
+  //     if (err) throw err;
+  //     loggedIn = result.loggedIn;
+  //   });
+  // });
   res.sendFile("public/chat.html", { root: __dirname });
   updateAPI();
 });
@@ -117,28 +115,6 @@ app.post("/chat", function (req, res) {
         if (err) throw err;
         db.close();
       });
-    });
-  } else if (type === "refresh") {
-    let user;
-    let password;
-    mongoClient.connect(url, (err, db) => {
-      let dbo = db.db("convrt_database");
-      dbo
-        .collection("userData")
-        .find({}, { projection: { _id: 0, email: 1, password: 1, loggedIn: 0 } })
-        .toArray((err, result) => {
-          userData = result;
-          user = userData["email"];
-          user = userData["password"];
-        });
-    });
-    let crawlScript = exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-      }
     });
   } else if (type === "addedLabel") {
     mongoClient.connect(url, (err, db) => {

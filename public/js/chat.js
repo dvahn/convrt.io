@@ -326,21 +326,6 @@ document.getElementById("textInput").addEventListener("keydown", function (e) {
   }
 });
 
-document.getElementById("refresh").addEventListener("click", function () {
-  console.log("Clicked REFRESH");
-  fetch("/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: {
-        type: "refresh",
-      },
-    }),
-  });
-});
-
 document.getElementById("deleteConversation").addEventListener("click", function () {
   console.log("Clicked DELETE");
   //TODO: delete current conversation from DB and LinkedIn (if possible)
