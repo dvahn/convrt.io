@@ -14,3 +14,5 @@ Simply run:
 
 After running through the setup CONVRT should be available at localhost:3000. Enter your LinkedIn Credentials and wait for convrt
 to transfer your conversations. This can take up to a few minutes, depending on how many conversations you have.
+
+The application will be updating and inserting your messages back to LinkedIn every 5 minutes.
