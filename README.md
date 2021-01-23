@@ -10,11 +10,7 @@ You need to have docker installed on your system.
 
 Simply run:
 
-`chmod +x bash convrt.sh`
+`make run`
 
-and afterwards:
-
-`bash convrt.sh`
-
-After running through the setup, which can take up to a few minutes, CONVRT should be available at localhost:3000. Enter your LinkedIn Credentials and wait for convrt
-to transfer your conversations.
+After running through the setup CONVRT should be available at localhost:3000. Enter your LinkedIn Credentials and wait for convrt
+to transfer your conversations. This can take up to a few minutes, depending on how many conversations you have.
