@@ -16,3 +16,13 @@ function checkLoginInput() {
   }
   return true;
 }
+
+function activateSpinner() {
+  let userInput = document.getElementById("username");
+  let passwordInput = document.getElementById("username");
+  let spinner = document.getElementById("preloader");
+
+  if (userInput.value.length != 0 && passwordInput.value.length != 0) {
+    spinner.style.display = "block";
+  }
+}
