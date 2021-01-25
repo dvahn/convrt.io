@@ -66,7 +66,7 @@ app.post("/", (req, res) => {
       mongoClient.connect(url, (err, db) => {
         if (err) throw err;
         let dbo = db.db("convrt_database");
-        let newUser = { email: user, password: password, loggedIn: true };
+        let newUser = { email: user, password: password, fullname: "Kollege Helm", loggedIn: true };
         dbo.collection("userData").insertOne(newUser, function (err, res) {
           if (err) throw err;
           db.close();
@@ -89,6 +89,7 @@ app.get("/chat", (req, res) => {
   //     loggedIn = result.loggedIn;
   //   });
   // });
+  loggedIn = true;
   res.sendFile("public/chat.html", { root: __dirname });
   updateAPI();
 });
@@ -143,9 +144,9 @@ app.post("/chat", function (req, res) {
   updateAPI();
 });
 
-// CRAWLING SCRIPT RIGHT BEFORE THAT!
 // Insert messages into LinkedIn every 5 minutes
 schedule.scheduleJob("*/5 * * * *", () => {
+  console.log("Syncing...");
   if (loggedIn) {
     let syncScript = exec("bash synchronize.sh", (err, stdout, stderr) => {
       if (err) {

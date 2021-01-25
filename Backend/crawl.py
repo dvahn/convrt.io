@@ -8,6 +8,7 @@ import sys
 client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client['convrt_database']
 conversations = db['conversations']
+userData = db['userData']
 
 # User Credentials
 if len(sys.argv) > 0:
@@ -20,6 +21,7 @@ xpath = {
     "login_user": "/html/body/div/main/div[3]/form/div[1]/input",
     "login_password": "/html/body/div/main/div[3]/form/div[2]/input",
     "login_button": "/html/body/div/main/div[3]/form/div[3]/button",
+    "user_fullname": "/html/body/div[8]/div[5]/div/div/div/aside[1]/div[1]/div[1]/a/div[2]",
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
@@ -51,6 +53,15 @@ try:
 
 except NoSuchElementException:
     print("Already logged in!")
+
+# get users full name
+driver.get("https://www.linkedin.com/")
+try:
+    user_fullname = driver.get_text_from_xpath(xpath["user_fullname"])
+except:
+    user_fullname = "Max Mustermann"
+query = {"email": username}
+fullusername = {"$set": {"fullname": user_fullname}}
 
 
 # start with message thread
@@ -121,5 +132,7 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
 # for collection in db:
 #     if db[collection].count() == 0:
 #         db[collection].drop()
+
+userData.update_one(query, fullusername)
 
 driver.quit()
