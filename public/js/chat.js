@@ -38,14 +38,6 @@ fetch("http://127.0.0.1:3000/api/conversations")
   })
   .catch((error) => console.log(error));
 
-if (loggedIn) {
-  document.getElementById("loginOverlay").style.display = "none";
-  document.getElementById("chat-container").style.display = "";
-} else {
-  document.getElementById("loginOverlay").style.display = "";
-  document.getElementById("chat-container").style.display = "none";
-}
-
 // SET UP CONVERSATIONS
 function createConversation(name, image, id) {
   let conversationList = document.getElementById("conversation-list");
@@ -162,6 +154,13 @@ function init() {
         setUpMessageFeed(id, img);
       }
     });
+  }
+  // SET UP DROPDOWN FOR SELECTABLE LABELS
+  selectableLabelsList = document.getElementById("selectableLabels");
+  for (label of allLabels) {
+    elem = document.createElement("p");
+    elem.innerText = label.name;
+    selectableLabelsList.appendChild(elem);
   }
   document.getElementById("send").addEventListener("click", sendMessage);
   if (initialLoad) {
