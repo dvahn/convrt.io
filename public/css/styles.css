@@ -395,16 +395,29 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
+  padding-top: 10%;
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
+  border-radius: 5px;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 200px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   padding: 12px 16px;
   z-index: 1;
+}
+
+.dropdown-item {
+  background-color: #dfdfdf;
+  margin-bottom: 5px;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+
+.dropdown-content:hover {
+  cursor: pointer;
 }
 
 .dropdown:hover .dropdown-content {

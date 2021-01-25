@@ -31,7 +31,6 @@ fetch("http://127.0.0.1:3000/api/conversations")
         allChats.push(person);
         createConversation(person.name, person.image, person.ID);
       }
-      console.log(allChats);
       getLabels();
       init();
     }
@@ -157,10 +156,15 @@ function init() {
   }
   // SET UP DROPDOWN FOR SELECTABLE LABELS
   selectableLabelsList = document.getElementById("selectableLabels");
+  selectableLabelsList.innerHTML = "";
   for (label of allLabels) {
+    container = document.createElement("div");
+    container.className = "dropdown-item";
     elem = document.createElement("p");
     elem.innerText = label.name;
-    selectableLabelsList.appendChild(elem);
+    container.appendChild(elem);
+    container.addEventListener("click", addLabel);
+    selectableLabelsList.appendChild(container);
   }
   document.getElementById("send").addEventListener("click", sendMessage);
   if (initialLoad) {
@@ -320,7 +324,7 @@ function getDate() {
 
 // SEND ON ENTER (maybe more shortcuts? (new Label e.g.))
 document.getElementById("textInput").addEventListener("keydown", function (e) {
-  if (e === 13) {
+  if (e.keyCode === 13) {
     sendMessage();
   }
 });
@@ -350,8 +354,8 @@ function getLabels() {
 }
 
 // ADD LABEL TO CONVERSATION
-function addLabel() {
-  let label = prompt("Add Label:");
+function addLabel(event) {
+  let label = event.target.innerText;
   let id;
   currentChat = document.getElementById("currentContact").innerHTML;
 
