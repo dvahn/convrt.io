@@ -7,3 +7,6 @@ run:
 	@echo ""
 	@echo "CONVRT is up and running on https://localhost:3000 !"
 	@echo ""
+
+test:
+	@echo "test"
