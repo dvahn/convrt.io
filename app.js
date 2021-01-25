@@ -12,7 +12,7 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 const mongoClient = mongo.MongoClient;
-const url = "mongodb://mongo:27017/convrt";
+const url = "mongodb://127.0.0.1:27017/convrt";
 
 let data = [];
 let messageFeeds = [];

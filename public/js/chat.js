@@ -158,9 +158,15 @@ function init() {
   // SET UP DROPDOWN FOR SELECTABLE LABELS
   selectableLabelsList = document.getElementById("selectableLabels");
   for (label of allLabels) {
+    container = document.createElement("div");
+    container.className = "dropdown-item";
     elem = document.createElement("p");
     elem.innerText = label.name;
-    selectableLabelsList.appendChild(elem);
+    container.appendChild(elem);
+    container.addEventListener("click", () => {
+      addLabel(label.name);
+    });
+    selectableLabelsList.appendChild(container);
   }
   document.getElementById("send").addEventListener("click", sendMessage);
   if (initialLoad) {
@@ -350,8 +356,8 @@ function getLabels() {
 }
 
 // ADD LABEL TO CONVERSATION
-function addLabel() {
-  let label = prompt("Add Label:");
+function addLabel(name) {
+  let label = name;
   let id;
   currentChat = document.getElementById("currentContact").innerHTML;
 
