@@ -13,11 +13,13 @@
             <br>
             <input id="password" type="password" class="loginInput" name="password" required>
             <br>
-            <button id="loginButton" type="submit" class="loginButton">LOGIN</button>
+            <button onclick="activateSpinner()" id="loginButton" type="submit" class="loginButton">LOGIN</button>
           </div>
         </form> 
     </div>
-    <div id="loadingSpinner" class="loader"></div>
+    <div id="preloader">
+      <div id="loader"></div>
+    </div>
    </body>
    <script src="./js/login.js"></script>
 </html>
