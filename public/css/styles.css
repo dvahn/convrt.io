@@ -326,6 +326,10 @@ body {
   display: none;
 }
 
+.new-label-confirm {
+  cursor: pointer;
+}
+
 .newLabelFormInput {
   width: 90%;
   padding-left: 5%;
@@ -423,8 +427,6 @@ body {
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
-/* Loading spinner */
 
 #preloader {
   position: fixed;
