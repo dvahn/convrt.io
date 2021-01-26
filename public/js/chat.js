@@ -46,7 +46,7 @@ function createConversation(name, image, id) {
   img.src = image;
   img.alt = name;
 
-  let title = document.createElement("div");
+  let title = document.createElement("span");
   title.className = "title-text";
   textnodeTitle = document.createTextNode(name);
   title.appendChild(textnodeTitle);
@@ -313,7 +313,7 @@ async function initLabels() {
     labelDiv.onclick = onLabelClick;
     labelDiv.id = label.name;
 
-    let labelText = document.createElement("div");
+    let labelText = document.createElement("span");
     labelText.className = "title-text";
     labelText.innerHTML = label.name;
 
@@ -384,6 +384,7 @@ function onLabelClick() {
 
 // ADD LABEL TO CONVERSATION
 function addLabel(event) {
+  document.getElementById("selectableLabels").style.display = "none";
   let label = event.target.innerText;
   let id;
   currentChat = document.getElementById("currentContact").innerHTML;
@@ -452,6 +453,33 @@ function toggleNewLabel() {
     icon.className = "";
     background.style = "background-color: white;";
   }
+}
+
+// SEARCH
+function search() {
+  let input = document.getElementById("searchInput");
+  let filter = input.value.toUpperCase();
+
+  let labels = document.querySelectorAll("div.label span");
+  let conversations = document.querySelectorAll("div.conversation span");
+
+  labels.forEach((label) => {
+    let labelName = label.innerText;
+    if (labelName.toUpperCase().indexOf(filter) > -1) {
+      document.getElementById(labelName).style.display = "";
+    } else {
+      document.getElementById(labelName).style.display = "none";
+    }
+  });
+
+  conversations.forEach((conv) => {
+    let name = conv.innerText;
+    if (name.toUpperCase().indexOf(filter) > -1) {
+      conv.parentElement.style.display = "";
+    } else {
+      conv.parentElement.style.display = "none";
+    }
+  });
 }
 
 // TODO:
