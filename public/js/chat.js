@@ -1,5 +1,3 @@
-let initialLoad = true;
-let loggedIn = false;
 let allChats = [];
 let allLabels = [
   {
@@ -31,8 +29,6 @@ fetch("http://127.0.0.1:3000/api/conversations")
         allChats.push(person);
         createConversation(person.name, person.image, person.ID);
       }
-      console.log(allChats);
-      getLabels();
       init();
     }
   })
@@ -134,6 +130,12 @@ function setUpMessageFeed(id, image) {
 }
 
 function init() {
+  initConversations();
+  document.getElementById("send").addEventListener("click", sendMessage);
+  initLabels();
+}
+
+function initConversations() {
   let conversations = document.getElementById("conversation-list").getElementsByClassName("conversation");
 
   if (conversations.length != 0) {
@@ -155,85 +157,6 @@ function init() {
       }
     });
   }
-  // SET UP DROPDOWN FOR SELECTABLE LABELS
-  selectableLabelsList = document.getElementById("selectableLabels");
-  selectableLabelsList.innerHTML = "";
-  for (label of allLabels) {
-    container = document.createElement("div");
-    container.className = "dropdown-item";
-    elem = document.createElement("p");
-    elem.innerText = label.name;
-    container.appendChild(elem);
-    container.addEventListener("click", addLabel);
-    selectableLabelsList.appendChild(container);
-  }
-  document.getElementById("send").addEventListener("click", sendMessage);
-  if (initialLoad) {
-    initialLoad = false;
-    initLabels();
-  }
-}
-
-// INITIALIZE LABELS
-function initLabels() {
-  let labelContainer = document.getElementById("label-list");
-  labelContainer.innerHTML = "";
-
-  for (label of allLabels) {
-    let labelDiv = document.createElement("div");
-    labelDiv.className = "label";
-    labelDiv.onclick = onLabelClick;
-    labelDiv.id = label.name;
-
-    let labelText = document.createElement("div");
-    labelText.className = "title-text";
-    labelText.innerHTML = label.name;
-
-    labelDiv.appendChild(labelText);
-    labelContainer.appendChild(labelDiv);
-  }
-
-  // ADD EVENTLISTENER TO LABELS
-  let labels = document.getElementById("label-list").getElementsByClassName("label");
-
-  for (label of labels) {
-    label.addEventListener("click", function () {
-      let current = document.getElementById("label-list").getElementsByClassName("active");
-      if ((current = !this)) {
-        current[0].className = current[0].className.replace(" active", "");
-        this.className += " active";
-      }
-    });
-  }
-  labels[0].className += " active";
-}
-
-// SORT CHATS BY LABEL
-function onLabelClick() {
-  let tags = [];
-  let labelName;
-  // GET TAGS FOR CURRENT LABEL
-  for (let label of allLabels) {
-    if (label.name === this.id) {
-      tags = label.tags;
-      labelName = label.name;
-    }
-  }
-  document.getElementById("conversation-list").innerHTML = "";
-  for (chat of allChats) {
-    if (labelName === "All Messages") {
-      createConversation(chat.name, chat.image, chat.ID);
-    } else if (chat.label === labelName) {
-      createConversation(chat.name, chat.image, chat.ID);
-    }
-  }
-
-  let current = document.getElementById("label-list").getElementsByClassName("active");
-  if (current[0].id !== this.id) {
-    current[0].className = current[0].className.replace(" active", "");
-    this.className += " active";
-  }
-  init();
 }
 
 function sendMessage() {
@@ -330,6 +253,14 @@ document.getElementById("textInput").addEventListener("keydown", function (e) {
   }
 });
 
+document.getElementById("newLabelInput").addEventListener("keydown", function (e) {
+  if (e.keyCode === 13) {
+    toggleNewLabel();
+    createNewLabel();
+  }
+});
+
+// TODO: REPLACE BY FUNCTION
 document.getElementById("deleteConversation").addEventListener("click", function () {
   console.log("Clicked DELETE");
   //TODO: delete current conversation from DB and LinkedIn (if possible)
@@ -337,13 +268,31 @@ document.getElementById("deleteConversation").addEventListener("click", function
 
 // LABELS
 
-// FETCH LABELS FROM API
-function getLabels() {
-  //allLabels = [];
-  fetch("http://127.0.0.1:3000/api/labels")
+// INITIALIZE LABELS
+async function initLabels() {
+  // FETCH LABELS FROM API
+  await fetch("http://127.0.0.1:3000/api/labels")
     .then((res) => res.json())
     .then((data) => {
-      labels = data;
+      let labels = data;
+      allLabels = [
+        {
+          name: "All Messages",
+          tags: [],
+        },
+        {
+          name: "Job",
+          tags: [],
+        },
+        {
+          name: "Family",
+          tags: [],
+        },
+        {
+          name: "Hobby",
+          tags: [],
+        },
+      ];
       for (label of labels) {
         allLabels.push({
           name: label.name,
@@ -352,6 +301,85 @@ function getLabels() {
       }
     })
     .catch((error) => console.log(error));
+
+  // CLEAR UP LABEL LIST
+  let labelContainer = document.getElementById("label-list");
+  labelContainer.innerHTML = "";
+
+  // SET UP LABEL LIST
+  for (label of allLabels) {
+    let labelDiv = document.createElement("div");
+    labelDiv.className = "label";
+    labelDiv.onclick = onLabelClick;
+    labelDiv.id = label.name;
+
+    let labelText = document.createElement("div");
+    labelText.className = "title-text";
+    labelText.innerHTML = label.name;
+
+    labelDiv.appendChild(labelText);
+    labelContainer.appendChild(labelDiv);
+  }
+
+  // ADD EVENTLISTENER TO LABELS
+  let labels = document.getElementById("label-list").getElementsByClassName("label");
+
+  for (label of labels) {
+    label.addEventListener("click", function () {
+      let current = document.getElementById("label-list").getElementsByClassName("active");
+      if ((current = !this)) {
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      }
+    });
+  }
+  labels[0].className += " active";
+
+  // SET UP LABEL DROPDOWN
+  selectableLabelsList = document.getElementById("selectableLabels");
+  selectableLabelsList.innerHTML = "";
+  for (label of allLabels) {
+    container = document.createElement("div");
+    container.className = "dropdown-item";
+    elem = document.createElement("p");
+    elem.innerText = label.name;
+    container.appendChild(elem);
+    container.addEventListener("click", addLabel);
+    selectableLabelsList.appendChild(container);
+  }
+}
+
+// SORT CHATS BY LABEL
+function onLabelClick() {
+  let tags = [];
+  let labelName;
+  // GET NAME AND TAGS OF CURRENT LABEL
+  for (let label of allLabels) {
+    if (label.name === this.id) {
+      tags = label.tags;
+      labelName = label.name;
+    }
+  }
+
+  // ONLY SHOW CONVERSATIONS WITH GIVEN LABEL
+  document.getElementById("conversation-list").innerHTML = "";
+  for (chat of allChats) {
+    if (labelName === "All Messages") {
+      createConversation(chat.name, chat.image, chat.ID);
+    } else if (chat.label === labelName) {
+      createConversation(chat.name, chat.image, chat.ID);
+    }
+  }
+
+  // SET CLICKED LABEL TO ACTIVE
+  let current = document.getElementById("label-list").getElementsByClassName("active");
+  if (current[0].id !== this.id) {
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  }
+
+  // SET UP ONCLICK FUNCTIONS FOR CONVERSATIONS
+  initConversations();
 }
 
 // ADD LABEL TO CONVERSATION
@@ -359,7 +387,6 @@ function addLabel(event) {
   let label = event.target.innerText;
   let id;
   currentChat = document.getElementById("currentContact").innerHTML;
-  console.log(currentChat);
 
   for (chat of allChats) {
     if (chat.name === currentChat) {
@@ -382,6 +409,35 @@ function addLabel(event) {
   });
 }
 
+async function createNewLabel() {
+  let newLabelName = document.getElementById("newLabelInput").value;
+  let newLabelTags = [];
+
+  allLabels.push({
+    name: newLabelName,
+    tags: newLabelTags,
+  });
+  // UPDATE/REINITIALIZE LABELS
+  toggleNewLabel();
+  initLabels();
+  location.reload();
+
+  await fetch("/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: {
+        type: "createdLabel",
+        name: newLabelName,
+        tags: newLabelTags,
+      },
+    }),
+  });
+}
+
+// TOGGLE INPUT BOX FOR NEW LABEL
 function toggleNewLabel() {
   let icon = document.getElementById("newLabelIcon");
   let background = document.getElementById("newLabel");
@@ -396,43 +452,6 @@ function toggleNewLabel() {
     icon.className = "";
     background.style = "background-color: white;";
   }
-}
-
-function closeLabelForm() {
-  document.getElementById("newLabelForm").style.display = "none";
-}
-
-function createNewLabel() {
-  let newLabelName = document.getElementById("newLabelInput").value;
-  let newLabelTags = [];
-
-  console.log(newLabelName);
-
-  fetch("/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: {
-        type: "createdLabel",
-        name: newLabelName,
-        tags: newLabelTags,
-      },
-    }),
-  });
-  allLabels.push({
-    name: newLabelName,
-    tags: newLabelTags,
-  });
-  toggleNewLabel();
-  updateLabels();
-}
-
-function updateLabels() {
-  getLabels();
-  // initLabels();
-  console.log(allLabels);
 }
 
 // TODO:

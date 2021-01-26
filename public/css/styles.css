@@ -326,6 +326,10 @@ body {
   display: none;
 }
 
+.new-label-confirm {
+  cursor: pointer;
+}
+
 .newLabelFormInput {
   width: 90%;
   padding-left: 5%;
