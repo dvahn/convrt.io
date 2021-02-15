@@ -5,27 +5,39 @@ import pymongo
 import sys
 import time
 
-## Create database ##
-client = pymongo.MongoClient("mongodb://mongo:27017/")
+## get user from args ##
+if len(sys.argv) > 0:
+    user = sys.argv[1]
+
+## database ##
+client = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client['convrt_database']
+users = db['users']
 conversations = db['conversations']
-userData = db['userData']
 all_ids = []
 
-for conversation in conversations.find():
-    all_ids.append(conversation["ID"])
 
 ## Parse credentials ##
-parsed_userData = userData.find_one()
-username = parsed_userData["email"]
-password = parsed_userData["password"]
+# QUERY AN DB MIT USERNAME
+# HIER DANN AUCH MESSAGEFEED SETZEN
+
+query = {"username": user}
+
+current_user = list(users.find(query))[0]
+email = current_user["li_mail"]
+password = current_user["li_password"]
+conversations_ids = current_user["conversations"]
+
+if len(conversations_ids) > 0:
+    for conv_id in conversations_ids:
+        all_ids.append(conv_id)
 
 # XPATH
 xpath = {
     # changes irregularly! (daily?)
-    "login_user": "/html/body/div/main/div[3]/form/div[1]/input",
-    "login_password": "/html/body/div/main/div[3]/form/div[2]/input",
-    "login_button": "/html/body/div/main/div[3]/form/div[3]/button",
+    "login_user": "/html/body/div/main/div[3]/div[1]/form/div[1]/input",
+    "login_password": "/html/body/div/main/div[3]/div[1]/form/div[2]/input",
+    "login_button": "/html/body/div/main/div[3]/div[1]/form/div[3]/button",
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
@@ -51,8 +63,11 @@ driver = ChromeBrowser()
 ## check if user is logged in ##
 try:
     driver.get("https://www.linkedin.com/login")
+
+    driver.wait()
+
     login_input = driver.find_element_by_xpath(xpath["login_user"])
-    login_input.send_keys(username)
+    login_input.send_keys(email)
 
     login_password = driver.find_element_by_xpath(xpath["login_password"])
     login_password.send_keys(password)
@@ -91,7 +106,8 @@ def crawl():
         driver.get("https://www.linkedin.com/messaging/thread/"+id+"/")
         driver.wait()
 
-        messages_database = list(db[id].find())
+        # QUERY AN DB MIT USERNAME
+        # messages_database = list(db[users].find())
 
         if id not in all_ids:
             # get name from DOM
@@ -102,17 +118,20 @@ def crawl():
                 xpath["image"].format(pos=i))
             image_src = image.get_attribute("src")
 
-            # add name + id to conversation collection
-            new = {"name": name, "ID": id, "image": image_src, "label": ""}
-            conversations.insert_one(new)
+            # add id to conversation array of user
+            conversations_ids.append(id)
+            new = {"$set": {"conversations": conversations_ids}}
+            users.update_one(query, new)
 
-            # create collection for currently scraped conversation
-            current_col_new = db[id]
+            # create new entry in conversations collection
+            # current_col_new = db[id]
+
+            message_feed = []
 
             lastSender = ""
             lastTime = ""
 
-            for i in range(len(messages_database) + 3, driver.get_elements_size(xpath["number_messages"])+1):
+            for i in range(3, driver.get_elements_size(xpath["number_messages"])+1):
 
                 try:
                     sender = driver.get_text_from_xpath(
@@ -139,20 +158,26 @@ def crawl():
                             xpath["only_message"].format(pos=i))
                     }
 
-                # insert single message to collection of currently scraped conversation
-                current_col_new.insert_one(message)
+                # insert single message to message_feed array
+                message_feed.append(message)
+            new_conversation = {"ID": id, "name": name, "image": image_src, "label": [
+            ], "message_feed": message_feed}
+            # create new conversation in conversation collection
+            conversations.insert_one(new_conversation)
 
         else:
-            current_col = db[id]
+            current = conversations.find({"ID": id})
+            messages_database = current[0]['messageFeed']
+            count_messages_database = len(messages_database)
             count_messages_linkedin = 0
             for n in range(3, driver.get_elements_size(xpath["number_messages"])+1):
                 count_messages_linkedin += 1
-            if count_messages_linkedin == len(messages_database):
+            if count_messages_linkedin == count_messages_database:
                 pass
             else:
                 lastSender = ""
                 lastTime = ""
-                for i in range(len(messages_database) + 3, driver.get_elements_size(xpath["number_messages"])+1):
+                for i in range(count_messages_database + 3, driver.get_elements_size(xpath["number_messages"])+1):
                     try:
                         sender = driver.get_text_from_xpath(
                             xpath["sender"].format(pos=i))
@@ -178,7 +203,11 @@ def crawl():
                                 xpath["only_message"].format(pos=i))
                         }
 
-                    current_col.insert_one(message)
+                    # current.insert_one(message)
+                    messages_database.append(message)
+
+                messages = {"$set": {"messageFeed": messages_database}}
+                conversations.update_one({"ID": id}, messages)
 
 # TODO: look for empty conversations
 
@@ -186,9 +215,12 @@ def crawl():
 
 
 def insert():
-    for conversation in conversations.find():
+
+    ids_of_current_user = current_user["conversations"]
+
+    for conv_id in ids_of_current_user:
         driver.get("https://www.linkedin.com/messaging/thread/" +
-                   conversation["ID"])
+                   conv_id)
 
         driver.wait()
 
@@ -199,7 +231,8 @@ def insert():
         if count_messages_linkedin == 0:
             pass
         else:
-            messages_database_inserting = list(db[conversation["ID"]].find())
+            messages_database_inserting = list(
+                conversations.find({"ID": conv_id}))
 
             if count_messages_linkedin == len(messages_database_inserting):
                 pass
