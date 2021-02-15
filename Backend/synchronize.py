@@ -28,8 +28,6 @@ email = current_user["li_mail"]
 password = current_user["li_password"]
 conversations_ids = current_user["conversations"]
 
-print(email, password)
-
 if len(conversations_ids) > 0:
     for conv_id in conversations_ids:
         all_ids.append(conv_id)
@@ -169,7 +167,7 @@ def crawl():
 
         else:
             current = conversations.find({"ID": id})
-            messages_database = current[0]['messageFeed']
+            messages_database = current[0]['message_feed']
             count_messages_database = len(messages_database)
             count_messages_linkedin = 0
             for n in range(3, driver.get_elements_size(xpath["number_messages"])+1):
@@ -208,7 +206,7 @@ def crawl():
                     # current.insert_one(message)
                     messages_database.append(message)
 
-                messages = {"$set": {"messageFeed": messages_database}}
+                messages = {"$set": {"message_feed": messages_database}}
                 conversations.update_one({"ID": id}, messages)
 
 # TODO: look for empty conversations
