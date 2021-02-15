@@ -212,7 +212,7 @@ body {
   padding: 0 20px;
 
   display: grid;
-  grid: 36px / 1fr 36px 36px;
+  grid: 36px / 1fr 36px 36px 36px;
   grid-gap: 30px;
   align-content: center;
   align-items: center;
