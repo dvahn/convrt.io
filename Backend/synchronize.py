@@ -28,6 +28,8 @@ email = current_user["li_mail"]
 password = current_user["li_password"]
 conversations_ids = current_user["conversations"]
 
+print(email, password)
+
 if len(conversations_ids) > 0:
     for conv_id in conversations_ids:
         all_ids.append(conv_id)
