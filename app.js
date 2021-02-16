@@ -17,19 +17,6 @@ app.use(cors());
 const mongoClient = mongo.MongoClient;
 const url = "mongodb://127.0.0.1:27017/convrt";
 
-let loggedIn = false;
-
-app.get("/", (req, res) => {
-  res.sendFile("public/login.html", { root: __dirname });
-});
-
-app.post("/", (req, res) => {
-  let user = req.body.username;
-  let password = req.body.password;
-
-  res.redirect("/chat");
-});
-
 // CREATE A NEW USER
 app.post("/signup", (req, res, next) => {
   const newUser = {
@@ -138,10 +125,15 @@ app.post("/refresh", function (req, res) {
 });
 
 // API
+async function loadUsers() {
+  let client = await mongoClient.connect(url);
+  return client.db("convrt_database").collection("users");
+}
 async function loadConversations() {
   let client = await mongoClient.connect(url);
   return client.db("convrt_database").collection("conversations");
 }
+// LOAD ALL CONVERSATIONS OF ALL USERS
 app.get("/api/conversations", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
@@ -149,7 +141,25 @@ app.get("/api/conversations", async (req, res) => {
   res.send(
     JSON.stringify(
       await conversations
-        .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1, label: 1, messageFeed: 1 } })
+        .find({}, { projection: { _id: 0, ID: 1, name: 1, image: 1, labels: 1, message_feed: 1 } })
+        .toArray()
+    )
+  );
+});
+// GET CONVERSATIONS FOR SPECIFIC USER
+app.get("/api/:user/conversations", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  let user = req.params.user;
+  let users = await loadUsers();
+  let conversations = await loadConversations();
+  res.send(
+    JSON.stringify(
+      await conversations
+        .find(
+          { associated_user: user },
+          { projection: { _id: 0, ID: 1, name: 1, image: 1, labels: 1, message_feed: 1 } }
+        )
         .toArray()
     )
   );
