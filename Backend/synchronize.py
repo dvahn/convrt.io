@@ -23,6 +23,7 @@ all_ids = []
 
 query = {"username": user}
 
+# TODO: make users unique
 current_user = list(users.find(query))[0]
 email = current_user["li_mail"]
 password = current_user["li_password"]
@@ -159,7 +160,7 @@ def crawl():
                     }
 
                 # insert single message to message_feed array
-                message_feed.append(message)
+                message_feed.insert(0, message)
             new_conversation = {"ID": id, "associated_user": user, "name": name, "image": image_src, "label": [
             ], "message_feed": message_feed}
             # create new conversation in conversation collection
@@ -204,7 +205,7 @@ def crawl():
                         }
 
                     # current.insert_one(message)
-                    messages_database.append(message)
+                    messages_database.insert(0, message)
 
                 messages = {"$set": {"message_feed": messages_database}}
                 conversations.update_one({"ID": id}, messages)

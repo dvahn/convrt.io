@@ -16,6 +16,7 @@ app.use(cors());
 
 const mongoClient = mongo.MongoClient;
 const url = "mongodb://127.0.0.1:27017/convrt";
+const defaultLabels = ["All Messages", "Job", "Family", "Hobby"];
 
 // CREATE A NEW USER
 app.post("/signup", (req, res, next) => {
@@ -24,7 +25,7 @@ app.post("/signup", (req, res, next) => {
     password: bcrypt.hashSync(req.body.password, 10),
     li_mail: req.body.li_mail,
     li_password: req.body.li_password,
-    labels: req.body.labels,
+    labels: defaultLabels,
     conversations: req.body.conversations,
   };
   // SAVE NEW USER TO DB
@@ -69,21 +70,23 @@ app.post("/login", (req, res, next) => {
   });
 });
 
-app.post("/sendMessage", function (req, res) {
-  console.log("message", req.body.message.sender, req.body.message.time, req.body.message.content, req.body.message.id);
-  mongoClient.connect(url, (err, db) => {
-    if (err) throw err;
-    let dbo = db.db("convrt_database");
-    let newMessage = {
-      sender: req.body.message.sender,
-      time: req.body.message.time,
-      content: req.body.message.content,
-    };
-    dbo.collection(req.body.message.id).insertOne(newMessage, function (err, res) {
-      if (err) throw err;
-      db.close();
-    });
-  });
+app.post("/sendMessage", async function (req, res) {
+  console.log(req.body);
+  let newMessage = {
+    sender: req.body.sender,
+    time: req.body.time,
+    content: req.body.content,
+  };
+  let conversations = await loadConversations();
+  let conversation = await conversations.find({ ID: req.body.receiver_id }, {}).toArray();
+  let message_feed = conversation[0].message_feed;
+  console.log(message_feed);
+  // let new_message_feed = message_feed.unshift(newMessage);
+  // console.log(new_message_feed);
+  let new_message = { $set: { message_feed: new_message_feed } };
+  // await conversations.updateOne({ ID: req.body.receiver_id }, new_message, function (err, res) {
+  //   if (err) throw err;
+  // });
 });
 
 app.post("/addLabel", function (req, res) {
@@ -151,7 +154,6 @@ app.get("/api/:user/conversations", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
   let user = req.params.user;
-  let users = await loadUsers();
   let conversations = await loadConversations();
   res.send(
     JSON.stringify(
@@ -159,6 +161,23 @@ app.get("/api/:user/conversations", async (req, res) => {
         .find(
           { associated_user: user },
           { projection: { _id: 0, ID: 1, name: 1, image: 1, labels: 1, message_feed: 1 } }
+        )
+        .toArray()
+    )
+  );
+});
+
+app.get("/api/:user/labels", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader("content-type", "application/json");
+  let user = req.params.user;
+  let users = await loadUsers();
+  res.send(
+    JSON.stringify(
+      await users
+        .find(
+          { username: user },
+          { projection: { _id: 0, username: 0, password: 0, li_mail: 0, li_password: 0, conversations: 0 } }
         )
         .toArray()
     )

@@ -11,10 +11,26 @@
         <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
       </div>
       <div id="conversation-list">
-   
+        <div @click="setActive(conversation)" class="conversation"
+          v-for="conversation in conversations"
+          v-bind:item="conversation"
+          v-bind:key="conversation.ID"
+          >
+          <img :src=conversation.image>
+          <span class="title-text">{{ conversation.name }}</span>
+          <div class="conversation-message">
+            <p>This is a placeholder</p>
+          </div>
+        </div>
       </div>
       <div id="label-list">
-
+        <div class="label"
+          v-for="label of labels"
+          v-bind:item="label"
+          v-bind:key="label + currentContact.ID"
+        >
+          <span class="title-text">{{ label }}</span>
+        </div>
       </div>
       <div id="new-label-container">
         <a id="newLabel" href="#" onclick="toggleNewLabel()"> <img id="newLabelIcon" src="../assets/images/add.svg" /> </a>
@@ -36,17 +52,44 @@
         </div>
         <img id="deleteConversation" src="../assets/images/trash.svg" alt="Delete Conversation" />
       </div>
-      <div id="chat-message-list"> 
-  
+      <div id="chat-message-list">
+        <div class="message-content"
+          v-for="message in activeMessageFeed"
+          v-bind:item="message"
+          v-bind:key="message.time + message.sender + message.content"
+          >
+          <div class="message-row other-message"
+          v-if="message.sender == currentContact.name"
+          >
+            <div class="message-content">
+              <img :src=currentContact.image>
+              <div class="message-text">
+                {{ message.content }}
+              </div>
+              <div class="message-time">
+                {{ message.time }}
+              </div>
+            </div>
+          </div>
+          <div v-else class="message-row you-message">
+            <div class="message-content">
+              <div class="message-text">
+                {{ message.content }}
+              </div>
+              <div class="message-time">
+                {{ message.time }}
+              </div>
+            </div>
+          </div>
+        </div> 
       </div>
       <div id="chat-form">
         <img id="attach" src="../assets/images/attachement.svg" alt="Add Attachment" />
-        <input name="message[content]" id="textInput" type="text" placeholder="Type a message..." />
-        <img id="send" src="../assets/images/senden.svg" alt="Send Message" />
+        <input v-model="message" name="message[content]" id="textInput" type="text" placeholder="Type a message..." />
+        <img @click="sendMessage" id="send" src="../assets/images/senden.svg" alt="Send Message" />
       </div>
     </div>
   </body>
-  <!-- <script src="../js/chat.js"></script> -->
   </div>
 </template>
 <script>
@@ -57,12 +100,21 @@ export default {
   data() {
     return {
       user: '',
+      conversations: '',
+      activeConversation: '',
+      currentContact: '',
+      activeMessageFeed: '',
+      labels: '',
+      message: ''
     }
   },
   created() {
     if (localStorage.getItem('token') === null) {
       this.$router.push('/');
-    } 
+    }
+    this.user = localStorage.getItem('user');
+    this.getConversations();
+    this.getLabels(); 
   },
   mounted() {
     this.user = localStorage.getItem('user');
@@ -72,11 +124,29 @@ export default {
       localStorage.clear();
       this.$router.push('/');
     },
+    async getConversations(){
+      this.conversations = await ApiService.getConversations(this.user);
+    },
+    async getLabels() {
+      this.labels = await ApiService.getLabels(this.user);
+    },
+    setActive(conv) {
+      this.activeConversation = conv.ID;
+      this.currentContact = conv;
+      for (conv of this.conversations) {
+        if(conv["ID"] == this.activeConversation) {
+          this.activeMessageFeed = conv.message_feed;
+        }
+      }
+    },
     refresh() {
       let user = {
         username: this.user,
       }
       ApiService.refresh(user);
+    },
+    sendMessage() {
+      ApiService.sendMessage(this.message, this.user, this.currentContact["ID"]);
     }
   }
 
@@ -292,6 +362,7 @@ body {
   grid-gap: 10px;
   color: #ddd;
   font-size: 1.3rem;
+  text-align: left;
   border-bottom: 0.2px solid rgba(0, 0, 0, 0.25);
   padding: 20px 20px 20px 15px;
 }
@@ -319,6 +390,7 @@ body {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  font-size: 70%;
 }
 
 .created-date {
@@ -329,6 +401,7 @@ body {
 .conversation-message {
   grid-column: span 2;
   padding-left: 5px;
+  font-size: 70%;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
