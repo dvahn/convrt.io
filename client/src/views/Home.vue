@@ -31,24 +31,36 @@
         >
           <span class="title-text">{{ label }}</span>
         </div>
+        <div class="new-label">
+          <input v-model="newLabel" class="label-input" type="text">
+          <button v-on:click="createLabel" class="add-label-button" v-if="newLabel !== ''">Add Label</button>
+        </div>
       </div>
       <div id="new-label-container">
-        <a id="newLabel" href="#" onclick="toggleNewLabel()"> <img id="newLabelIcon" src="../assets/images/add.svg" /> </a>
-        <div id="newLabelForm" style="display: none">
-          <input id="newLabelInput" class="newLabelFormInput" placeholder="New Label"/>
-        </div>
+        <!-- <a id="newLabel" href="#" onclick="toggleNewLabel()"> <img id="newLabelIcon" src="../assets/images/add.svg" /> </a> -->
+        <!-- <div id="newLabelForm" style="display: none"> -->
+          <!-- <input id="newLabelInput" class="newLabelFormInput" placeholder="New Label"/> -->
+        <!-- </div> -->
 
-        <div id="newLabelConfirm" class="new-label-confirm" style="display: none;">
-          <a onclick="createNewLabel()">+</a>
-        </div>
+        <!-- <div id="newLabelConfirm" class="new-label-confirm" style="display: none;"> -->
+          <!-- <a onclick="createNewLabel()">+</a> -->
+        <!-- </div> -->
 
       </div>
       <div id="chat-title">
-        <span id="currentContact"></span>
+        <span class="chat-title-name" id="currentContact">{{ currentContact.name }}</span>
         <img @click="refresh" id="refresh" src="../assets/images/mail.svg">
         <div class="dropdown">
           <img class="dropdown" id="addLabel" src="../assets/images/hinzufuegen.svg" alt="Add Label" onclick="addLabel()" />
-          <div id="selectableLabels" class="dropdown-content"></div>
+          <div id="selectableLabels" class="dropdown-content">
+            <div v-on:click="addLabel(label)" class="dropdown-item" 
+              v-for="label of labels"
+              v-bind:item="label"
+              v-bind:key="label"
+              >
+              <p>{{ label }}</p>
+            </div>
+          </div>
         </div>
         <img id="deleteConversation" src="../assets/images/trash.svg" alt="Delete Conversation" />
       </div>
@@ -105,7 +117,8 @@ export default {
       currentContact: '',
       activeMessageFeed: '',
       labels: '',
-      message: ''
+      message: '',
+      newLabel: ''
     }
   },
   async created() {
@@ -144,12 +157,20 @@ export default {
       this.conversations = await ApiService.getConversations(this.user);
       this.setActive(this.currentContact);
       this.message = '';
+    },
+    async createLabel() {
+      await ApiService.createLabel(this.newLabel, this.user);
+      this.labels = await ApiService.getLabels(this.user);
+      this.newLabel = '';
+    },
+    async addLabel(label) {
+      await ApiService.addLabel(this.currentContact.ID, label);
     }
   }
 }
 </script>
 <style scoped>
-  * {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -162,7 +183,7 @@ body {
 
 html {
   font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(to right, #57c1eb, #006cac);
+  /* background: linear-gradient(to right, #57c1eb, #006cac); */
   font-size: 10px;
 }
 
@@ -172,7 +193,7 @@ body {
 }
 
 .home {
-  background: linear-gradient(to right, #57c1eb, #006cac);  
+  /* background: linear-gradient(to right, #57c1eb, #006cac);   */
 }
 
 #chat-container {
@@ -183,9 +204,11 @@ body {
   min-width: 1000px;
   max-width: 1000px;
   max-height: 800px;
+  margin-top: 3%;
   height: 95vh;
   background: #fff;
   border-radius: 10px;
+  border: 1px solid rgb(100, 100, 100);
 }
 
 #conversation-list,
@@ -263,6 +286,7 @@ body {
   font-size: 3.6rem;
 }
 
+
 #chat-title {
   grid-column-start: 3;
   grid-column-end: 3;
@@ -282,6 +306,10 @@ body {
   align-content: center;
   align-items: center;
   z-index: 2;
+}
+
+.chat-title-name {
+  text-align: left;
 }
 
 #chat-title > img {
@@ -331,11 +359,28 @@ body {
   color: #ddd;
   font-size: 1.3rem;
   border-bottom: 0.2px solid rgba(0, 0, 0, 0.25);
-  padding: 20px 20px 20px 15px;
+  padding: 20px 20px 20px 20px;
+  text-align: center;
+}
+
+.new-label {
+  padding: 10px;
+}
+
+.label-input {
+  outline: none;
+  padding: 15px;
+  width: 100%;
+  height: 20px;
+  border: 2px solid #ddd;
+  color: #330;
+  border-radius: 6px;
+  font-size: 1.4rem;
 }
 
 .label:hover {
   cursor: pointer;
+  background: #00304d;
 }
 
 .label.active {
@@ -456,7 +501,7 @@ body {
 
 .message-text {
   padding: 9px 14px;
-  font-size: 1.6rem;
+  font-size: 1.15rem;
   margin-bottom: 5px;
   z-index: 1;
 }
@@ -512,7 +557,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
-  padding-top: 10%;
+  padding-top: 20%;
 }
 
 .dropdown-content {
@@ -539,5 +584,22 @@ body {
 
 .dropdown:hover .dropdown-content {
   display: block;
+}
+
+.add-label-button {
+  width: 90%;
+  height: 5vh;
+  margin-left: auto;
+  margin-top: 5%;
+  border-radius: 7px;
+  border-style: none;
+  font-size: 100%;
+  color: white;
+  background-color: rgb(88, 88, 88);
+}
+
+.add-label-button:hover {
+  background-color: #b9b9b9;
+  cursor: pointer;
 }
 </style>

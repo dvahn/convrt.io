@@ -92,27 +92,35 @@ app.post("/sendMessage", async function (req, res) {
   });
 });
 
-app.post("/addLabel", function (req, res) {
-  mongoClient.connect(url, (err, db) => {
+// add label to a conversation
+app.post("/addLabel", async function (req, res) {
+  console.log(req.body.contact, req.body.label);
+  let conversations = await loadConversations();
+  await conversations.find({ ID: req.body.contact }, {}).toArray(async function (err, result) {
     if (err) throw err;
-    let dbo = db.db("convrt_database");
-    let query = { ID: req.body.message.id };
-    let label = { $set: { label: req.body.message.label } };
-    dbo.collection("conversations").updateOne(query, label, function (err, res) {
+    let labels = result[0].labels;
+    labels[labels.length] = req.body.label;
+    let newLabels = { $set: { labels: labels } };
+    await conversations.updateOne({ ID: req.body.contact }, newLabels, function (err, result) {
       if (err) throw err;
-      db.close();
+      res.status(200).send({ message: "Added label." });
     });
   });
 });
 
-app.post("/createLabel", function (req, res) {
-  mongoClient.connect(url, (err, db) => {
-    if (err) throw err;
-    let dbo = db.db("convrt_database");
-    let newLabel = { name: req.body.message.name, tags: req.body.message.tags };
-    dbo.collection("labels").insertOne(newLabel, function (err, res) {
+// create new label for a specific user
+app.post("/createLabel", async function (req, res) {
+  let user = req.body.user;
+  let newLabel = req.body.name;
+  let users = await loadUsers();
+  users.find({ username: user }, {}).toArray(async function (err, result) {
+    if (err) throw er;
+    let labels = result[0].labels;
+    labels[labels.length] = newLabel;
+    let newLabels = { $set: { labels: labels } };
+    users.updateOne({ username: user }, newLabels, function (err, result) {
       if (err) throw err;
-      db.close();
+      res.status(200).send({ message: "Creating new label" });
     });
   });
 });

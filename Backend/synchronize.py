@@ -161,7 +161,7 @@ def crawl():
 
                 # insert single message to message_feed array
                 message_feed.insert(0, message)
-            new_conversation = {"ID": id, "associated_user": user, "name": name, "image": image_src, "label": [
+            new_conversation = {"ID": id, "associated_user": user, "name": name, "image": image_src, "labels": [
             ], "message_feed": message_feed}
             # create new conversation in conversation collection
             conversations.insert_one(new_conversation)

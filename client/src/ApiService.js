@@ -29,15 +29,15 @@ class ApiService {
   // send message
   static async sendMessage(messageText, sender, receiver_id) {
     if (messageText !== "") {
-      let message = {
+      let data = {
         content: messageText,
         time: this.getDate(),
         sender: sender,
         receiver_id: receiver_id,
       };
-      await axios.post(url + "sendMessage", message).then(
+      await axios.post(url + "sendMessage", data).then(
         (res) => {
-          console.log("Sending message", res);
+          console.log("Sending message.", res);
         },
         (err) => {
           console.log(err);
@@ -46,9 +46,35 @@ class ApiService {
     }
   }
   // add label
-  static addLabel() {}
+  static async addLabel(contact, label) {
+    let data = {
+      contact: contact,
+      label: label,
+    };
+    await axios.post(url + "addLabel", data).then(
+      (res) => {
+        console.log("Adding new label to contact.", res);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
   // create label
-  static createLabel() {}
+  static async createLabel(label, user) {
+    let data = {
+      name: label,
+      user: user,
+    };
+    await axios.post(url + "createLabel", data).then(
+      (res) => {
+        console.log("Creating new label.", res);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
   // get time
   static getDate() {
     let today = new Date();
