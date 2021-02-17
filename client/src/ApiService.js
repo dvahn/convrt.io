@@ -27,7 +27,7 @@ class ApiService {
     );
   }
   // send message
-  static sendMessage(messageText, sender, receiver_id) {
+  static async sendMessage(messageText, sender, receiver_id) {
     if (messageText !== "") {
       let message = {
         content: messageText,
@@ -35,7 +35,7 @@ class ApiService {
         sender: sender,
         receiver_id: receiver_id,
       };
-      axios.post(url + "sendMessage", message).then(
+      await axios.post(url + "sendMessage", message).then(
         (res) => {
           console.log("Sending message", res);
         },

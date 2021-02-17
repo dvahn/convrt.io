@@ -60,10 +60,10 @@ app.post("/login", (req, res, next) => {
         // check for invalid password
         if (result[0]) {
           if (!bcrypt.compareSync(req.body.password, result[0].password)) {
-            res.send(401, { message: "login failed", error: "invalid credentials" });
+            res.status(401).send({ message: "login failed", error: "invalid credentials" });
           }
           let token = jwt.sign({ userId: result[0]._id }, "secretkey");
-          res.send(200, { message: "login succeeded", token: token, user: req.body.username });
+          res.status(200).send({ message: "login succeeded", token: token, user: req.body.username });
         }
         db.close();
       });
@@ -71,22 +71,25 @@ app.post("/login", (req, res, next) => {
 });
 
 app.post("/sendMessage", async function (req, res) {
-  console.log(req.body);
   let newMessage = {
     sender: req.body.sender,
     time: req.body.time,
     content: req.body.content,
   };
   let conversations = await loadConversations();
-  let conversation = await conversations.find({ ID: req.body.receiver_id }, {}).toArray();
-  let message_feed = conversation[0].message_feed;
-  console.log(message_feed);
-  // let new_message_feed = message_feed.unshift(newMessage);
-  // console.log(new_message_feed);
-  let new_message = { $set: { message_feed: new_message_feed } };
-  // await conversations.updateOne({ ID: req.body.receiver_id }, new_message, function (err, res) {
-  //   if (err) throw err;
-  // });
+  await conversations.find({ ID: req.body.receiver_id }, {}).toArray(async function (err, result) {
+    if (err) throw er;
+    let message_feed = result[0].message_feed;
+    for (let i = message_feed.length; i > 0; i--) {
+      message_feed[i] = message_feed[i - 1];
+    }
+    message_feed[0] = newMessage;
+    let new_message = { $set: { message_feed: message_feed } };
+    await conversations.updateOne({ ID: req.body.receiver_id }, new_message, function (err, result) {
+      if (err) throw err;
+      res.status(200).send({ message: "Send message" });
+    });
+  });
 });
 
 app.post("/addLabel", function (req, res) {

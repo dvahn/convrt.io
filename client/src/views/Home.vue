@@ -11,7 +11,7 @@
         <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
       </div>
       <div id="conversation-list">
-        <div @click="setActive(conversation)" class="conversation"
+        <div v-on:click="setActive(conversation)" class="conversation"
           v-for="conversation in conversations"
           v-bind:item="conversation"
           v-bind:key="conversation.ID"
@@ -86,7 +86,7 @@
       <div id="chat-form">
         <img id="attach" src="../assets/images/attachement.svg" alt="Add Attachment" />
         <input v-model="message" name="message[content]" id="textInput" type="text" placeholder="Type a message..." />
-        <img @click="sendMessage" id="send" src="../assets/images/senden.svg" alt="Send Message" />
+        <img  v-on:click="sendMessage" id="send" src="../assets/images/senden.svg" alt="Send Message" />
       </div>
     </div>
   </body>
@@ -108,13 +108,13 @@ export default {
       message: ''
     }
   },
-  created() {
+  async created() {
     if (localStorage.getItem('token') === null) {
       this.$router.push('/');
     }
     this.user = localStorage.getItem('user');
-    this.getConversations();
-    this.getLabels(); 
+    this.conversations = await ApiService.getConversations(this.user);
+    this.labels = await ApiService.getLabels(this.user);  
   },
   mounted() {
     this.user = localStorage.getItem('user');
@@ -123,12 +123,6 @@ export default {
     logout() {
       localStorage.clear();
       this.$router.push('/');
-    },
-    async getConversations(){
-      this.conversations = await ApiService.getConversations(this.user);
-    },
-    async getLabels() {
-      this.labels = await ApiService.getLabels(this.user);
     },
     setActive(conv) {
       this.activeConversation = conv.ID;
@@ -145,12 +139,13 @@ export default {
       }
       ApiService.refresh(user);
     },
-    sendMessage() {
-      ApiService.sendMessage(this.message, this.user, this.currentContact["ID"]);
+    async sendMessage() {
+      await ApiService.sendMessage(this.message, this.user, this.currentContact["ID"]);
+      this.conversations = await ApiService.getConversations(this.user);
+      this.setActive(this.currentContact);
+      this.message = '';
     }
   }
-
- 
 }
 </script>
 <style scoped>
