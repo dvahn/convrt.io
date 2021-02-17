@@ -28,7 +28,7 @@ app.post("/signup", (req, res, next) => {
     labels: defaultLabels,
     conversations: req.body.conversations,
   };
-  // SAVE NEW USER TO DB
+  // save new user to db
   mongoClient.connect(url, (err, db) => {
     if (err) throw err;
     let dbo = db.db("convrt_database");
@@ -41,7 +41,7 @@ app.post("/signup", (req, res, next) => {
     });
   });
 });
-
+// LOGIN
 app.post("/login", (req, res, next) => {
   mongoClient.connect(url, (err, db) => {
     if (err) throw err;
@@ -69,7 +69,7 @@ app.post("/login", (req, res, next) => {
       });
   });
 });
-
+// SEND A MESSAGE
 app.post("/sendMessage", async function (req, res) {
   let newMessage = {
     sender: req.body.sender,
@@ -92,7 +92,7 @@ app.post("/sendMessage", async function (req, res) {
   });
 });
 
-// add label to a conversation
+// ADD LABEL TO A CONVERSATION
 app.post("/addLabel", async function (req, res) {
   console.log(req.body.contact, req.body.label);
   let conversations = await loadConversations();
@@ -108,7 +108,7 @@ app.post("/addLabel", async function (req, res) {
   });
 });
 
-// create new label for a specific user
+// CREATE NEW LABEL FOR A SPECIFIC USER
 app.post("/createLabel", async function (req, res) {
   let user = req.body.user;
   let newLabel = req.body.name;
@@ -124,7 +124,7 @@ app.post("/createLabel", async function (req, res) {
     });
   });
 });
-
+// CRAWL AND INSERT NEW MESSAGES TO LINKEDIN
 app.post("/refresh", function (req, res) {
   // mehrfach Ausführung abfangen
   let user = req.body.username;
@@ -137,8 +137,7 @@ app.post("/refresh", function (req, res) {
     }
   });
 });
-
-// API
+// HELPER FUNCTIONS THAT RETURN MONGODB COLLECTIONS
 async function loadUsers() {
   let client = await mongoClient.connect(url);
   return client.db("convrt_database").collection("users");
@@ -177,7 +176,7 @@ app.get("/api/:user/conversations", async (req, res) => {
     )
   );
 });
-
+// GET LABELS OF A USER
 app.get("/api/:user/labels", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
@@ -193,17 +192,6 @@ app.get("/api/:user/labels", async (req, res) => {
         .toArray()
     )
   );
-});
-
-async function loadLabels() {
-  let client = await mongoClient.connect(url);
-  return client.db("convrt_database").collection("labels");
-}
-app.get("/api/labels", async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.setHeader("content-type", "application/json");
-  let labels = await loadLabels();
-  res.send(JSON.stringify(await labels.find({}, { projection: { _id: 0, name: 1, tags: 1 } }).toArray()));
 });
 
 app.listen(port);
