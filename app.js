@@ -94,7 +94,6 @@ app.post("/sendMessage", async function (req, res) {
 
 // ADD LABEL TO A CONVERSATION
 app.post("/addLabel", async function (req, res) {
-  console.log(req.body.contact, req.body.label);
   let conversations = await loadConversations();
   await conversations.find({ ID: req.body.contact }, {}).toArray(async function (err, result) {
     if (err) throw err;
@@ -154,7 +153,7 @@ app.get("/api/conversations", async (req, res) => {
   res.send(
     JSON.stringify(
       await conversations
-        .find({}, { projection: { _id: 0, ID: 1, name: 1, image: 1, labels: 1, message_feed: 1 } })
+        .find({}, { projection: { _id: 0, ID: 1, name: 1, image: 1, show: 1, labels: 1, message_feed: 1 } })
         .toArray()
     )
   );
@@ -170,7 +169,7 @@ app.get("/api/:user/conversations", async (req, res) => {
       await conversations
         .find(
           { associated_user: user },
-          { projection: { _id: 0, ID: 1, name: 1, image: 1, labels: 1, message_feed: 1 } }
+          { projection: { _id: 0, ID: 1, name: 1, image: 1, show: 1, labels: 1, message_feed: 1 } }
         )
         .toArray()
     )

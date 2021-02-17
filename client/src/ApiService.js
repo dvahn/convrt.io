@@ -8,8 +8,6 @@ class ApiService {
     const conversations = await axios.get(url + "api/" + user + "/conversations");
     return conversations.data;
   }
-  // get message Feeds
-  static getMessageFeeds() {}
   // get labels
   static async getLabels(user) {
     const users = await axios.get(url + "api/" + user + "/labels");

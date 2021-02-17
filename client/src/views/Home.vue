@@ -11,8 +11,10 @@
         <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
       </div>
       <div id="conversation-list">
-        <div v-on:click="setActive(conversation)" class="conversation" v-bind:class="{ active: conversation.ID == currentContact.ID }"
-          v-for="conversation in conversations"
+        <div v-on:click="setActive(conversation)" 
+          class="conversation" 
+          v-bind:class="{ active: conversation.ID == currentContact.ID }"
+          v-for="conversation in activeConversations"
           v-bind:item="conversation"
           v-bind:key="conversation.ID"
           >
@@ -24,7 +26,7 @@
         </div>
       </div>
       <div id="label-list">
-        <div class="label"
+        <div v-on:click="selectLabel(label)" class="label"
           v-for="label of labels"
           v-bind:item="label"
           v-bind:key="label + currentContact.ID"
@@ -49,9 +51,9 @@
       </div>
       <div id="chat-title">
         <span class="chat-title-name" id="currentContact">{{ currentContact.name }}</span>
-        <img @click="refresh" id="refresh" src="../assets/images/mail.svg">
+        <img v-on:click="refresh" id="refresh" src="../assets/images/mail.svg">
         <div class="dropdown">
-          <img class="dropdown" id="addLabel" src="../assets/images/hinzufuegen.svg" alt="Add Label" onclick="addLabel()" />
+          <img class="dropdown" id="addLabel" src="../assets/images/hinzufuegen.svg" alt="Add Label"/>
           <div id="selectableLabels" class="dropdown-content">
             <div v-on:click="addLabel(label)" class="dropdown-item" 
               v-for="label of labels"
@@ -109,6 +111,17 @@ import ApiService from '../ApiService';
 
 export default {
   name: 'Home',
+  computed: {
+    activeConversations: function() {
+      let activeConvos = [];
+      for (let convo of this.conversations){
+        if(convo.show) {
+          activeConvos.push(convo);
+        }
+      }
+      return activeConvos;   
+    }
+  },
   data() {
     return {
       user: '',
@@ -146,6 +159,18 @@ export default {
         }
       }
     },
+    selectLabel(label) {
+      console.log(this.conversations);
+      for (let convo of this.conversations) {
+        if(!(convo.labels.includes(label))) {
+          convo.show = false;
+        } else {
+          convo.show = true;
+        }
+      }
+      this.currentContact = this.activeConversations[0];
+      this.setActive(this.currentContact);
+    },
     refresh() {
       let user = {
         username: this.user,
@@ -165,7 +190,9 @@ export default {
     },
     async addLabel(label) {
       await ApiService.addLabel(this.currentContact.ID, label);
-    }
+      this.conversations = await ApiService.getConversations(this.user);
+      // document.getElementById("selectableLabels").style.display = "none"
+    },
   }
 }
 </script>
