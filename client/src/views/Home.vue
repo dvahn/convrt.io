@@ -11,7 +11,7 @@
         <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
       </div>
       <div id="conversation-list">
-        <div v-on:click="setActive(conversation)" class="conversation"
+        <div v-on:click="setActive(conversation)" class="conversation" v-bind:class="{ active: conversation.ID == currentContact.ID }"
           v-for="conversation in conversations"
           v-bind:item="conversation"
           v-bind:key="conversation.ID"
