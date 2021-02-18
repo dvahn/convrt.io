@@ -6,6 +6,9 @@
     <!-- <link rel="stylesheet" type="text/css" media="screen" href="./css/styles.css" /> -->
   </head>
   <body>
+    <div class="logout">
+      <button v-on:click="logout" >Sign out</button>
+    </div>
     <div id="chat-container">
       <div id="search-container">
         <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
@@ -70,6 +73,13 @@
           <h1>Welcome to CONVRT.io!</h1>
           <br>
           <p>Start importing your LinkedIn messages by clicking the refresh icon.</p>
+          <p>After that you will see them on the left side and you are good to go.</p>
+          <br>
+          <div class="spinner-container">
+            <div id="preloader">
+              <div id="loader"></div>
+            </div>
+          </div>
         </div>
         <div class="message-content"
           v-for="message in activeMessageFeed"
@@ -145,7 +155,7 @@ export default {
     }
     this.user = localStorage.getItem('user');
     this.conversations = await ApiService.getConversations(this.user);
-    this.labels = await ApiService.getLabels(this.user);  
+    this.labels = await ApiService.getLabels(this.user); 
   },
   mounted() {
     this.user = localStorage.getItem('user');
@@ -167,22 +177,24 @@ export default {
     },
     selectLabel(label) {
       for (let convo of this.conversations) {
-        if(!(convo.labels.includes(label))) {
-          convo.show = false;
-        } else {
+        if(convo.labels.includes(label)) {
           convo.show = true;
+          this.currentContact = this.activeConversations[0];
+          this.setActive(this.currentContact);
+        } else {
+          convo.show = false;
         }
       }
       this.currentLabel = label;
-      this.currentContact = this.activeConversations[0];
-      this.setActive(this.currentContact);
-      console.log(this.currentLabel);
+      
     },
-    refresh() {
+    async refresh() {
       let user = {
         username: this.user,
       }
-      ApiService.refresh(user);
+      await ApiService.refresh(user);
+      this.conversations = await ApiService.getConversations(this.user);
+      this.labels = await ApiService.getLabels(this.user);  
     },
     async sendMessage() {
       await ApiService.sendMessage(this.message, this.user, this.currentContact["ID"]);
@@ -238,7 +250,7 @@ body {
   min-width: 1000px;
   max-width: 1000px;
   max-height: 800px;
-  margin-top: 3%;
+  margin-top: 2%;
   height: 95vh;
   background: #fff;
   border-radius: 10px;
@@ -629,17 +641,19 @@ body {
   border-style: none;
   font-size: 100%;
   color: white;
-  background-color: rgb(88, 88, 88);
+  background-color: rgb(44, 44, 44);
 }
 
 .add-label-button:hover {
-  background-color: #b9b9b9;
+  background-color: #c0c0c0;
   cursor: pointer;
+  border: 1px solid rgb(44, 44, 44);
+  color: black;
 }
 
 .greeting {
   text-align: center;
-  padding-bottom: 50%;
+  padding-bottom: 30%;
 }
 
 .greeting h1 {
@@ -648,6 +662,99 @@ body {
 
 .greeting p {
   font-size: 1.2rem;
+}
+
+.logout {
+  display: grid;
+  grid-template-columns: 10% 80% 10%;
+  min-width: 900px;
+  max-width: 900px;
+}
+
+.logout button {
+  grid-column: 3;
+}
+
+.logout button:hover {
+  cursor: pointer;
+}
+
+#preloader {
+  position: relative;
+  display: none;
+  margin-top: 10%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#loader {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #494949;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+#loader:before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #363636;
+  -webkit-animation: spin 3s linear infinite;
+  animation: spin 3s linear infinite;
+}
+#loader:after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #000000;
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-container {
+  margin-top: 100px;
 }
 
 </style>

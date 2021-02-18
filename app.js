@@ -135,6 +135,9 @@ app.post("/refresh", function (req, res) {
       console.log(`stderr: ${stderr}`);
     }
   });
+  syncScript.on("close", function () {
+    res.status(200).send({ message: "Crawled messages from LinkedIn." });
+  });
 });
 // HELPER FUNCTIONS THAT RETURN MONGODB COLLECTIONS
 async function loadUsers() {

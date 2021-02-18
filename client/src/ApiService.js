@@ -14,10 +14,13 @@ class ApiService {
     return users.data[0].labels;
   }
   // refresh
-  static refresh(user) {
+  static async refresh(user) {
+    document.getElementById("preloader").style.display = "block";
     axios.post(url + "refresh", user).then(
       (res) => {
         console.log("refreshing", res);
+        document.getElementById("preloader").style.display = "none";
+        window.location.reload();
       },
       (err) => {
         console.log(err);
