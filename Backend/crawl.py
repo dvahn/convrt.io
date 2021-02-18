@@ -5,10 +5,11 @@ import pymongo
 import sys
 
 ## Create database ##
-client = pymongo.MongoClient("mongodb://mongo:27017/")
+client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 db = client['convrt_database']
+
+users = db['users']
 conversations = db['conversations']
-userData = db['userData']
 
 # User Credentials
 if len(sys.argv) > 0:
@@ -79,6 +80,8 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
         xpath["id_container"].format(pos=i))
     id = id_container.get_attribute("href").split("/")[5]
 
+    print("https://www.linkedin.com/messaging/thread/"+id+"/")
+
     # call next conversation
     driver.get("https://www.linkedin.com/messaging/thread/"+id+"/")
     driver.wait()
@@ -90,12 +93,9 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
     image = driver.find_element_by_xpath(xpath["image"].format(pos=i))
     image_src = image.get_attribute("src")
 
-    # add name + id to conversation collection
-    new = {"name": name, "ID": id, "image": image_src, "label": ""}
-    conversations.insert_one(new)
-
     # create collection for currently scraped conversation
-    current_col = db[id]
+    # current_col = db[id]
+    messageFeed = []
 
     lastSender = ""
     lastTime = ""
@@ -125,9 +125,15 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
                     xpath["only_message"].format(pos=i))
             }
 
-        # insert single message to collection of currently scraped conversation
-        current_col.insert_one(message)
+        messageFeed.append(message)
 
+        # insert single message to collection of currently scraped conversation
+        # current_col.insert_one(message)
+
+    # add name + id to conversation collection
+    new = {"name": name, "ID": id, "image": image_src,
+           "label": "", "messageFeed": messageFeed}
+    users.insert_one(new)
 # # check for empty collections
 # for collection in db:
 #     if db[collection].count() == 0:
