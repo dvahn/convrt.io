@@ -17,16 +17,15 @@ RUN python -m pip install pymongo
 
 COPY package.json ./
 # COPY public ./
+COPY --from=ui-build /app/dist ./dist
 
 RUN npm install
-RUN npm install -g @vue/cli
 
 COPY . .
 
 ENV PORT=3000
-ENV PORT=8080
 
 EXPOSE 3000
-EXPOSE 8080
+
 
 

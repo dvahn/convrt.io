@@ -4,15 +4,10 @@ services:
     container_name: web
     build: ./client
     restart: always
-    command: ["npm", "run", "serve"]
+    # command: ["npm", "run", "serve"]
     ports:
       - "8080:8080"
-    depends_on:
-      - "api"
-      - "mongo"
-    links:
-      - "api"
-      - "mongo"
+
   api:
     container_name: api
     build: .
@@ -21,6 +16,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      - "web"
       - "mongo"
     links:
       - mongo
