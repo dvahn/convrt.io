@@ -11,7 +11,7 @@
     </div>
     <div id="chat-container">
       <div id="search-container">
-        <input onkeyup="search()" id="searchInput" type="text" placeholder="Search" />
+        <input v-on:keyup="search" v-model="searchInput" type="text" placeholder="Search" />
       </div>
       <div id="conversation-list">
         <div v-on:click="setActive(conversation)" 
@@ -146,7 +146,8 @@ export default {
       labels: '',
       message: '',
       newLabel: '',
-      currentLabel: ''
+      currentLabel: '',
+      searchInput: ''
     }
   },
   async created() {
@@ -186,7 +187,17 @@ export default {
         }
       }
       this.currentLabel = label;
-      
+    },
+    search() {
+      // let input = this.searchInput.toUpperCase();
+      // this.activeConversations.forEach(conv => {
+      //   if (conv.labels[0].toUpperCase().indexOf(input) > -1) {
+      //     console.log(conv.labels);
+      //   } else {
+      //     console.log("no")
+      //   }  
+      // });
+      console.log("not implemented yet, WIP");
     },
     async refresh() {
       let user = {
