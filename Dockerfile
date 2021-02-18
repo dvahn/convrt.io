@@ -17,7 +17,8 @@ RUN python -m pip install pymongo
 
 COPY package.json ./
 # COPY public ./
-COPY --from=ui-build /app/dist ./dist
+# COPY /app/dist ./dist
+RUN cp -R /shared/dist ./dist
 
 RUN npm install
 

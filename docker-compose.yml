@@ -7,6 +7,8 @@ services:
     # command: ["npm", "run", "serve"]
     ports:
       - "8080:8080"
+    volumes:
+      - "./myshare:/shared"
 
   api:
     container_name: api
@@ -22,6 +24,8 @@ services:
       - mongo
       - hub
       - chrome
+    volumes:
+      - "./myshare:/shared"
   mongo:
     container_name: mongo
     image: mongo
@@ -59,4 +63,6 @@ services:
 
 volumes:
   db-data:
+    driver: local
+  myshare:
     driver: local

@@ -1,6 +1,6 @@
-FROM node:12 as ui-build
+FROM node:10 as ui-build
 
-WORKDIR /app
+WORKDIR /shared
 
 COPY . .
 RUN npm install && npm run build
