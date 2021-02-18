@@ -26,7 +26,7 @@
         </div>
       </div>
       <div id="label-list">
-        <div v-on:click="selectLabel(label)" class="label"
+        <div v-on:click="selectLabel(label)" class="label" v-bind:class="{ active : label == currentLabel}"
           v-for="label of labels"
           v-bind:item="label"
           v-bind:key="label + currentContact.ID"
@@ -47,7 +47,6 @@
         <!-- <div id="newLabelConfirm" class="new-label-confirm" style="display: none;"> -->
           <!-- <a onclick="createNewLabel()">+</a> -->
         <!-- </div> -->
-
       </div>
       <div id="chat-title">
         <span class="chat-title-name" id="currentContact">{{ currentContact.name }}</span>
@@ -67,6 +66,11 @@
         <img id="deleteConversation" src="../assets/images/trash.svg" alt="Delete Conversation" />
       </div>
       <div id="chat-message-list">
+        <div class="greeting" v-if="!currentContact">
+          <h1>Welcome to CONVRT.io!</h1>
+          <br>
+          <p>Start importing your LinkedIn messages by clicking the refresh icon.</p>
+        </div>
         <div class="message-content"
           v-for="message in activeMessageFeed"
           v-bind:item="message"
@@ -131,7 +135,8 @@ export default {
       activeMessageFeed: '',
       labels: '',
       message: '',
-      newLabel: ''
+      newLabel: '',
+      currentLabel: ''
     }
   },
   async created() {
@@ -144,6 +149,7 @@ export default {
   },
   mounted() {
     this.user = localStorage.getItem('user');
+    this.currentLabel = "All Messages";
   },
   methods: {
     logout() {
@@ -160,7 +166,6 @@ export default {
       }
     },
     selectLabel(label) {
-      console.log(this.conversations);
       for (let convo of this.conversations) {
         if(!(convo.labels.includes(label))) {
           convo.show = false;
@@ -168,8 +173,10 @@ export default {
           convo.show = true;
         }
       }
+      this.currentLabel = label;
       this.currentContact = this.activeConversations[0];
       this.setActive(this.currentContact);
+      console.log(this.currentLabel);
     },
     refresh() {
       let user = {
@@ -629,4 +636,18 @@ body {
   background-color: #b9b9b9;
   cursor: pointer;
 }
+
+.greeting {
+  text-align: center;
+  padding-bottom: 50%;
+}
+
+.greeting h1 {
+  font-size: 1.8rem;
+}
+
+.greeting p {
+  font-size: 1.2rem;
+}
+
 </style>
