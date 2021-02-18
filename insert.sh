@@ -1,1 +1,0 @@
-nohup python3 Backend/insert.py &> insert_log.txt

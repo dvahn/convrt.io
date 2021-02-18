@@ -2,9 +2,22 @@ version: "3"
 services:
   web:
     container_name: web
+    build: ./client
+    restart: always
+    command: ["npm", "run", "serve"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "api"
+      - "mongo"
+    links:
+      - "api"
+      - "mongo"
+  api:
+    container_name: api
     build: .
     restart: always
-    command: Backend/setup.sh ${LOGIN} ${PASSWORD}
+    command: Backend/setup.sh
     ports:
       - "3000:3000"
     depends_on:

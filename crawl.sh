@@ -1,1 +1,0 @@
-nohup python3 Backend/crawl.py $1 $2 &> crawl_log.txt
