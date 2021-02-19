@@ -1,6 +1,8 @@
 const path = require("path");
 const mongo = require("mongodb");
-const schedule = require("node-schedule");
+const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const port = process.env.PORT || 3000;
 
@@ -10,180 +12,190 @@ const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded());
 app.use(express.json());
+app.use(cors());
 
 const mongoClient = mongo.MongoClient;
 const url = "mongodb://mongo:27017/convrt";
+const defaultLabels = ["All Messages", "Job", "Family", "Hobby"];
 
-let data = [];
-let messageFeeds = [];
-let labels = [];
-let loggedIn = false;
-
-function updateAPI() {
+// CREATE A NEW USER
+app.post("/signup", (req, res, next) => {
+  const newUser = {
+    username: req.body.username,
+    password: bcrypt.hashSync(req.body.password, 10),
+    li_mail: req.body.li_mail,
+    li_password: req.body.li_password,
+    labels: defaultLabels,
+    conversations: req.body.conversations,
+  };
+  // save new user to db
   mongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("convrt_database");
+    dbo.collection("users").insertOne(newUser, function (err, response) {
+      if (err) {
+        res.send(400, { message: "Username already in use!", error: err });
+      }
+      db.close();
+      res.send(200, { message: "Signup succeeded" });
+    });
+  });
+});
+// LOGIN
+app.post("/login", (req, res, next) => {
+  mongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    let query = { username: req.body.username };
     let dbo = db.db("convrt_database");
     dbo
-      .collection("conversations")
-      .find({}, { projection: { _id: 0, name: 1, ID: 1, image: 1, label: 1 } })
-      .toArray((err, result) => {
-        data = result;
-        console.log(data);
-        for (let i = 0; i < data.length; i++) {
-          console.log(data[i].ID);
-          dbo
-            .collection(data[i].ID)
-            .find({}, { projection: { _id: 0, sender: 1, time: 1, content: 1 } })
-            .toArray((err, result) => {
-              let obj = {};
-              obj[data[i].ID] = result;
-              messageFeeds.push(obj);
-            });
+      .collection("users")
+      .find(query)
+      .toArray(function (err, result) {
+        if (err) {
+          res.send(400, { message: "server error", error: err });
         }
+        if (!result[0]) {
+          res.send(401, { message: "user not found", error: "invalid credentials" });
+        }
+        // check for invalid password
+        if (result[0]) {
+          if (!bcrypt.compareSync(req.body.password, result[0].password)) {
+            res.status(401).send({ message: "login failed", error: "invalid credentials" });
+          }
+          let token = jwt.sign({ userId: result[0]._id }, "secretkey");
+          res.status(200).send({ message: "login succeeded", token: token, user: req.body.username });
+        }
+        db.close();
       });
-    console.log(messageFeeds);
-    dbo
-      .collection("labels")
-      .find({}, { projection: { _id: 0, name: 1, tags: 1 } })
-      .toArray((err, result) => {
-        labels = result;
-      });
-    console.log(labels);
   });
-}
-
-app.get("/", (req, res) => {
-  res.sendFile("public/login.html", { root: __dirname });
 });
 
-app.post("/", (req, res) => {
-  let user = req.body.username;
-  let password = req.body.password;
+// SEND A MESSAGE
+app.post("/sendMessage", async function (req, res) {
+  let newMessage = {
+    sender: req.body.sender,
+    time: req.body.time,
+    content: req.body.content,
+  };
+  let conversations = await loadConversations();
+  await conversations.find({ ID: req.body.receiver_id }, {}).toArray(async function (err, result) {
+    if (err) throw er;
+    let message_feed = result[0].message_feed;
+    for (let i = message_feed.length; i > 0; i--) {
+      message_feed[i] = message_feed[i - 1];
+    }
+    message_feed[0] = newMessage;
+    let new_message = { $set: { message_feed: message_feed } };
+    await conversations.updateOne({ ID: req.body.receiver_id }, new_message, function (err, result) {
+      if (err) throw err;
+      res.status(200).send({ message: "Send message" });
+    });
+  });
+});
 
-  let crawlScript = exec("bash crawl.sh " + user + " " + password, (err, stdout, stderr) => {
+// ADD LABEL TO A CONVERSATION
+app.post("/addLabel", async function (req, res) {
+  let conversations = await loadConversations();
+  await conversations.find({ ID: req.body.contact }, {}).toArray(async function (err, result) {
+    if (err) throw err;
+    let labels = result[0].labels;
+    labels[labels.length] = req.body.label;
+    let newLabels = { $set: { labels: labels } };
+    await conversations.updateOne({ ID: req.body.contact }, newLabels, function (err, result) {
+      if (err) throw err;
+      res.status(200).send({ message: "Added label." });
+    });
+  });
+});
+
+// CREATE NEW LABEL FOR A SPECIFIC USER
+app.post("/createLabel", async function (req, res) {
+  let user = req.body.user;
+  let newLabel = req.body.name;
+  let users = await loadUsers();
+  users.find({ username: user }, {}).toArray(async function (err, result) {
+    if (err) throw er;
+    let labels = result[0].labels;
+    labels[labels.length] = newLabel;
+    let newLabels = { $set: { labels: labels } };
+    users.updateOne({ username: user }, newLabels, function (err, result) {
+      if (err) throw err;
+      res.status(200).send({ message: "Creating new label" });
+    });
+  });
+});
+      
+// CRAWL AND INSERT NEW MESSAGES TO LINKEDIN
+app.post("/refresh", function (req, res) {
+  // mehrfach Ausführung abfangen
+  let user = req.body.username;
+  let syncScript = exec("bash synchronize.sh " + user, (err, stdout, stderr) => {
     if (err) {
       console.error(err);
     } else {
-      mongoClient.connect(url, (err, db) => {
-        if (err) throw err;
-        let dbo = db.db("convrt_database");
-        let newUser = { email: user, password: password, fullname: "Kollege Helm", loggedIn: true };
-        dbo.collection("userData").insertOne(newUser, function (err, res) {
-          if (err) throw err;
-          db.close();
-        });
-      });
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
     }
   });
-  crawlScript.on("close", () => {
-    res.redirect("/chat");
+  syncScript.on("close", function () {
+    res.status(200).send({ message: "Crawled messages from LinkedIn." });
   });
 });
-
-app.get("/chat", (req, res) => {
-  // connect to DB, check if logged in
-  // if loggedIn == true, show chat page
-  // mongoClient.connect(url, (err, db) => {
-  //   let dbo = db.db("convrt_database");
-  //   dbo.collection("userData").findOne({}, function (err, result) {
-  //     if (err) throw err;
-  //     loggedIn = result.loggedIn;
-  //   });
-  // });
-  loggedIn = true;
-  res.sendFile("public/chat.html", { root: __dirname });
-  updateAPI();
-});
-
-app.post("/chat", function (req, res) {
-  let type = req.body.message.type;
-  if (type === "message") {
-    console.log(
-      "message",
-      req.body.message.sender,
-      req.body.message.time,
-      req.body.message.content,
-      req.body.message.id
-    );
-    mongoClient.connect(url, (err, db) => {
-      if (err) throw err;
-      let dbo = db.db("convrt_database");
-      let newMessage = {
-        sender: req.body.message.sender,
-        time: req.body.message.time,
-        content: req.body.message.content,
-      };
-      dbo.collection(req.body.message.id).insertOne(newMessage, function (err, res) {
-        if (err) throw err;
-        db.close();
-      });
-    });
-  } else if (type === "addedLabel") {
-    mongoClient.connect(url, (err, db) => {
-      if (err) throw err;
-      let dbo = db.db("convrt_database");
-      let query = { ID: req.body.message.id };
-      let label = { $set: { label: req.body.message.label } };
-      dbo.collection("conversations").updateOne(query, label, function (err, res) {
-        if (err) throw err;
-        db.close();
-      });
-    });
-  } else if (type === "createdLabel") {
-    mongoClient.connect(url, (err, db) => {
-      if (err) throw err;
-      let dbo = db.db("convrt_database");
-      let newLabel = { name: req.body.message.name, tags: req.body.message.tags };
-      dbo.collection("labels").insertOne(newLabel, function (err, res) {
-        if (err) throw err;
-        db.close();
-      });
-    });
-  } else {
-    console.log("Unknown type!");
-  }
-  updateAPI();
-});
-
-// Insert messages into LinkedIn every 5 minutes
-schedule.scheduleJob("*/5 * * * *", () => {
-  console.log("Syncing...");
-  if (loggedIn) {
-    let syncScript = exec("bash synchronize.sh", (err, stdout, stderr) => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-      }
-    });
-  }
-});
-
-// API
-
-app.get("/api/conversations", (req, res) => {
+// HELPER FUNCTIONS THAT RETURN MONGODB COLLECTIONS
+async function loadUsers() {
+  let client = await mongoClient.connect(url);
+  return client.db("convrt_database").collection("users");
+}
+async function loadConversations() {
+  let client = await mongoClient.connect(url);
+  return client.db("convrt_database").collection("conversations");
+}
+// LOAD ALL CONVERSATIONS OF ALL USERS
+app.get("/api/conversations", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(data));
+  let conversations = await loadConversations();
+  res.send(
+    JSON.stringify(
+      await conversations
+        .find({}, { projection: { _id: 0, ID: 1, name: 1, image: 1, show: 1, labels: 1, message_feed: 1 } })
+        .toArray()
+    )
+  );
 });
-
-app.get("/api/messageFeeds", (req, res) => {
+// GET CONVERSATIONS FOR SPECIFIC USER
+app.get("/api/:user/conversations", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(messageFeeds));
+  let user = req.params.user;
+  let conversations = await loadConversations();
+  res.send(
+    JSON.stringify(
+      await conversations
+        .find(
+          { associated_user: user },
+          { projection: { _id: 0, ID: 1, name: 1, image: 1, show: 1, labels: 1, message_feed: 1 } }
+        )
+        .toArray()
+    )
+  );
 });
-
-app.get("/api/labels", (req, res) => {
+// GET LABELS OF A USER
+app.get("/api/:user/labels", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/json");
-  res.send(JSON.stringify(labels));
+  let user = req.params.user;
+  let users = await loadUsers();
+  res.send(
+    JSON.stringify(
+      await users
+        .find(
+          { username: user },
+          { projection: { _id: 0, username: 0, password: 0, li_mail: 0, li_password: 0, conversations: 0 } }
+        )
+        .toArray()
+    )
+  );
 });
 
 app.listen(port);
-
-// next steps:
-
-// readme schreiben
-// python script vom Frontend callen
-// labels
-// syncronize on shutdown

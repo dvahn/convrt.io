@@ -2,17 +2,30 @@ version: "3"
 services:
   web:
     container_name: web
+    build: ./client
+    restart: always
+    # command: ["npm", "run", "serve"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./myshare:/shared"
+
+  api:
+    container_name: api
     build: .
     restart: always
-    command: Backend/setup.sh ${LOGIN} ${PASSWORD}
+    command: Backend/setup.sh
     ports:
       - "3000:3000"
     depends_on:
+      - "web"
       - "mongo"
     links:
       - mongo
       - hub
       - chrome
+    volumes:
+      - "./myshare:/shared"
   mongo:
     container_name: mongo
     image: mongo
@@ -50,4 +63,6 @@ services:
 
 volumes:
   db-data:
+    driver: local
+  myshare:
     driver: local
