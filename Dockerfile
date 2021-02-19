@@ -6,7 +6,6 @@ RUN chmod +x Backend/setup.sh
 RUN chmod +x synchronize.sh 
 RUN pip3 install selenium
 
-
 FROM node:12
 
 WORKDIR /app
@@ -16,9 +15,6 @@ RUN python get-pip.py
 RUN python -m pip install pymongo
 
 COPY package.json ./
-# COPY public ./
-# COPY /app/dist ./dist
-RUN cp -R /shared/dist ./dist
 
 RUN npm install
 
