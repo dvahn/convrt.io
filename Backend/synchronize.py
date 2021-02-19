@@ -10,7 +10,7 @@ if len(sys.argv) > 0:
     user = sys.argv[1]
 
 ## database ##
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient("mongodb://mongo:27017/")
 db = client['convrt_database']
 users = db['users']
 conversations = db['conversations']

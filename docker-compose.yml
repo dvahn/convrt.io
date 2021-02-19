@@ -4,11 +4,9 @@ services:
     container_name: web
     build: ./client
     restart: always
-    # command: ["npm", "run", "serve"]
+    command: ["serve", "-s", "dist"]
     ports:
-      - "8080:8080"
-    volumes:
-      - "./myshare:/shared"
+      - "5000:5000"
 
   api:
     container_name: api
@@ -24,8 +22,7 @@ services:
       - mongo
       - hub
       - chrome
-    volumes:
-      - "./myshare:/shared"
+
   mongo:
     container_name: mongo
     image: mongo
@@ -63,6 +60,4 @@ services:
 
 volumes:
   db-data:
-    driver: local
-  myshare:
     driver: local

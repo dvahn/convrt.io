@@ -1,10 +1,13 @@
 FROM node:10 as ui-build
 
-WORKDIR /shared
+WORKDIR /app
 
 COPY . .
 RUN npm install && npm run build
+RUN npm install -g serve
 
-ENV PORT=8080
+# RUN serve -s dist 
 
-EXPOSE 8080
+ENV PORT=5000
+
+EXPOSE 5000
