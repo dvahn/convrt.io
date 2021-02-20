@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://localhost:3000/";
+const url = "http://ec2-3-21-234-151.us-east-2.compute.amazonaws.com:3000/";
 
 class ApiService {
   // get conversations
