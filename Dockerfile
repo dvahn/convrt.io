@@ -10,9 +10,9 @@ FROM node:12
 
 WORKDIR /app
 
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN python get-pip.py
-RUN python -m pip install pymongo
+# RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+# RUN python get-pip.py
+# RUN python -m pip install pymongo
 
 COPY package.json ./
 
