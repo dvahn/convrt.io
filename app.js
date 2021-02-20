@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cors());
 
 const mongoClient = mongo.MongoClient;
-const url = "mongodb://mongo:27017/convrt";
+const url = "mongodb://ec2-13-59-233-180.us-east-2.compute.amazonaws.com:27017/convrt";
 const defaultLabels = ["All Messages", "Job", "Family", "Hobby"];
 
 // CREATE A NEW USER
@@ -124,7 +124,7 @@ app.post("/createLabel", async function (req, res) {
     });
   });
 });
-      
+
 // CRAWL AND INSERT NEW MESSAGES TO LINKEDIN
 app.post("/refresh", function (req, res) {
   // mehrfach Ausführung abfangen
