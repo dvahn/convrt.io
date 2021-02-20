@@ -44,7 +44,7 @@ export default {
         username: this.username,
         password: this.password
       }
-    axios.post("http://localhost:3000/login", user)
+    axios.post("http://ec2-13-59-233-180.us-east-2.compute.amazonaws.com:3000/login", user)
       .then(res => {
         if (res.status === 200) {
           this.error = '';
