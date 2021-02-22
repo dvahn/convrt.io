@@ -85,6 +85,9 @@ except NoSuchElementException:
 
 driver.wait()
 
+driver.get("https://www.linkedin.com/feed/")
+driver.wait()
+
 # start with message thread
 driver.get("https://www.linkedin.com/messaging/")
 id_of_first_conversation = driver.current_url.split('/')[-2]
