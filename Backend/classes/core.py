@@ -56,24 +56,24 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
             self = webdriver.Remote.__init__(
                 self, command_executor=executor, desired_capabilities=options.to_capabilities())
 
-        if self.mode == "LOCAL":
+        # if self.mode == "LOCAL":
 
-            exec_path_driver = self.config.get('LOCAL', 'exec_path_driver')
-            exec_path_chrome = self.config.get('LOCAL', 'exec_path_chrome')
+        #     exec_path_driver = self.config.get('LOCAL', 'exec_path_driver')
+        #     exec_path_chrome = self.config.get('LOCAL', 'exec_path_chrome')
 
-            options = webdriver.ChromeOptions()  # Chrome Options
-            # Extract this path from "chrome://version/"
-            options.add_argument("--user-data-dir=" + exec_path_chrome)
-            #options.add_argument("--profile-directory=" + self.profile)
-            options.add_argument("--window-size=700,1000 ")
-            options.add_argument("--window-position=800,0")
-            # LEARNING: scrap following does not work when headless browser
-            # options.add_argument("--headless") # LEARNING: headless option yields wrong results for content
+        #     options = webdriver.ChromeOptions()  # Chrome Options
+        #     # Extract this path from "chrome://version/"
+        #     options.add_argument("--user-data-dir=" + exec_path_chrome)
+        #     #options.add_argument("--profile-directory=" + self.profile)
+        #     options.add_argument("--window-size=700,1000 ")
+        #     options.add_argument("--window-position=800,0")
+        #     # LEARNING: scrap following does not work when headless browser
+        #     # options.add_argument("--headless") # LEARNING: headless option yields wrong results for content
             # options.add_argument("--no-sandbox")
             # options.add_argument("--disable-dev-shm-usage")
             # options.add_argument("--disable-gpu")
-            self = webdriver.Chrome.__init__(
-                self, executable_path=exec_path_driver, options=options)
+            # self = webdriver.Chrome.__init__(
+            #     self, executable_path=exec_path_driver, options=options)
 
     # wait randomly within MIN_MAX_WAIT frame
 
