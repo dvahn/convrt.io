@@ -37,9 +37,9 @@ if len(conversations_ids) > 0:
 # XPATH
 xpath = {
     # changes irregularly! (daily?)
-    "login_user": "/html/body/div/main/div[3]/div[1]/form/div[1]/input",
-    "login_password": "/html/body/div/main/div[3]/div[1]/form/div[2]/input",
-    "login_button": "/html/body/div/main/div[3]/div[1]/form/div[3]/button",
+    "login_user": "/html/body/div/main/div[2]/div[1]/form/div[1]/input",
+    "login_password": "/html/body/div/main/div[2]/div[1]/form/div[2]/input",
+    "login_button": "/html/body/div/main/div[2]/div[1]/form/div[3]/button",
     "number_conversations": "/html/body/div[8]/div[5]/div[1]/div/div/div[1]/ul/li",
     "id_container": "//li[{pos}]/div/a",
     "name": "//li[{pos}]/div/a/div[2]/div/div[1]/h3",
