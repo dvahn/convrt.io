@@ -1,6 +1,6 @@
 # convrt.io
 
-Convrt.io is an alternative chatting interface for the messenger provided by LinkedIn. Along with a well arranged design, convrt.io offers the possibility to sort your different contacts via a labeling functionality. The long-term goal is to implement an intelligent assistant, which helps the user organizing his messaging as well as his appointment scheduling.
+Convrt.io is an alternative chatting interface for the messenger provided by LinkedIn. Along with a well arranged design, convrt.io offers the possibility to sort your different contacts via a labeling functionality. Getting and sending messages via LinkedIn is realized with the refreshing button on the top right. The long-term goal is to implement an intelligent assistant, which helps the user organizing his messaging as well as his appointment scheduling. 
 
 The application is currently running inside several docker containers which are ready to be deployed on an AWS EC2 cloud instance. 
 
@@ -35,6 +35,6 @@ sudo chmod +x /usr/local/bin/docker-compose
 - Close terminal session and log back in to adopt all changes
 - Open another terminal, ssh to instance and run `sudo dockerd` to start a docker daemon
 - Head back to your first terminal session, cd into project folder and run `make run`
-- After the setup, you can access the convrt application on <instances-public-DNS>:5000
+- After the setup, you can access the convrt application on instances-public-DNS:5000
 
 ## Debugging
