@@ -69,11 +69,9 @@ try:
     driver.wait()
 
     login_input = driver.find_element_by_xpath(xpath["login_user"])
-    driver.wait()
     login_input.send_keys(email)
 
     login_password = driver.find_element_by_xpath(xpath["login_password"])
-    driver.wait()
     login_password.send_keys(password)
 
     login_button = driver.find_element_by_xpath(xpath["login_button"])
@@ -81,9 +79,11 @@ try:
 
     driver.wait()
 
+
 except NoSuchElementException:
     print("Already logged in!")
 
+driver.wait()
 
 # start with message thread
 driver.get("https://www.linkedin.com/messaging/")
