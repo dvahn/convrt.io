@@ -75,18 +75,15 @@ try:
     login_password.send_keys(password)
 
     login_button = driver.find_element_by_xpath(xpath["login_button"])
-    login_button.click()
+    # login_button.click()
+    driver.click_on_button(xpath["login_button"])
 
     driver.wait()
-
 
 except NoSuchElementException:
     print("Already logged in!")
 
-driver.wait()
-
-driver.get("https://www.linkedin.com/feed/")
-driver.wait()
+driver.wait_time(10)
 
 # start with message thread
 driver.get("https://www.linkedin.com/messaging/")
