@@ -11,7 +11,7 @@ if len(sys.argv) > 0:
 
 ## database ##
 client = pymongo.MongoClient(
-    "mongodb://ec2-13-59-233-180.us-east-2.compute.amazonaws.com:27017")
+    "mongodb://ip-172-31-29-226.us-east-2.compute.internal:27017")
 db = client['convrt_database']
 users = db['users']
 conversations = db['conversations']
