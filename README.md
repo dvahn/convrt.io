@@ -49,10 +49,11 @@ sudo chmod +x /usr/local/bin/docker-compose
 - Open another terminal, ssh to instance and run `sudo dockerd` to start a docker daemon
 - Head back to your first terminal session, cd into project folder and run `make run`
 - After the setup, you can access the convrt application on instances-public-DNS:5000
+- As an AWS EC2 free tier instance only has 1GB of storage, it is recommended to run `docker image prune -a` before each restart to delete unused docker images that can take up a lot of storage space 
 
 ## Debugging
 
 As mentioned before it is highly recommended to develop new features using on of the local deployment methods, because you can see the impact of your changes straightaway. When deploying to the cloud, there should only be minor bugs left, as building and deploying each time you make a change is not that efficient.
-The most error-prone part of the application is scraping the data from LinkedIn. The elements read are specified as xpaths, which change every few days and thus lead to errors and disfunctionality of the program. To better see what exactly goes wrong in such a case, the VNC Viewer is recommended. Depending on the type of deployment, you can connect to either `localhost:9001` or `instances-public-IP:9001` and see live how the scraper acts and where exactly it screws up.
+The most error-prone part of the application is scraping the data from LinkedIn. The elements read are specified as xpaths, which change every few days and thus lead to errors and disfunctionality of the program. To better see what exactly goes wrong in such a case, the VNC Viewer is recommended. Depending on the type of deployment, you can connect to either `localhost:9001` or `instances-public-IP:9001` and see live how the scraper acts and where exactly it screws up. In addition, the output of the scraping script is saved to a text file (sync_log.txt), which can provide information about any error messages.
 
 
