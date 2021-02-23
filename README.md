@@ -1,14 +1,27 @@
 # convrt.io
 
-Convrt.io is an alternative chatting interface for the messenger provided by LinkedIn. Along with a well arranged design, convrt.io offers the possibility to sort your different contacts via a labeling functionality. Getting and sending messages via LinkedIn is realized with the refreshing button on the top right. The long-term goal is to implement an intelligent assistant, which helps the user organizing his messaging as well as his appointment scheduling. 
+Convrt.io is an alternative chatting interface for the messenger provided by LinkedIn. Along with a well arranged design, convrt.io offers the possibility to sort your different contacts via a labeling functionality. Getting and sending messages via LinkedIn is realized with the refreshing button on the top right, which calls a python script that scrapes the data from LinkedIn, using the Selenium framework. The long-term goal is to implement an intelligent assistant, which helps the user organizing his messaging as well as his appointment scheduling. 
 
 The application is currently running inside several docker containers which are ready to be deployed on an AWS EC2 cloud instance. 
 
 ## Running the project
 
-You can either run the project locally or deploy it to a cloud provider, such as AWS.
+You can either run the project locally, locally with Docker or deploy it to a cloud provider, such as AWS.
+Local deployment is recommended for bugfixing and testing issues, while delivering to the cloud is good for providing the program to others. 
 
 ### Local deployment
+
+- Install npm on your system
+- Clone the repository
+- cd into the project folder
+- run `npm run dev` to launch the API
+- cd into the "client" folder
+- run `npm run serve` to launch the Vue.js frontend
+- to build, run `npm run build` which will create a "dist" folder
+- install "serve" by running `npm i -g serve`
+- deploy with `serve -s dist`
+
+### Local Docker deployment
 
 - Install and launch Docker on your system 
 - Clone the project, start a terminal session and 'cd' into the project folder
@@ -38,3 +51,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 - After the setup, you can access the convrt application on instances-public-DNS:5000
 
 ## Debugging
+
+As mentioned before it is highly recommended to develop new features using on of the local deployment methods, because you can see the impact of your changes straightaway. When deploying to the cloud, there should only be minor bugs left, as building and deploying each time you make a change is not that efficient.
+The most error-prone part of the application is scraping the data from LinkedIn. The elements read are specified as xpaths, which change every few days and thus lead to errors and disfunctionality of the program. To better see what exactly goes wrong in such a case, the VNC Viewer is recommended. Depending on the type of deployment, you can connect to either `localhost:9001` or `instances-public-IP:9001` and see live how the scraper acts and where exactly it screws up.
+
+
