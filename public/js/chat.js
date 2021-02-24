@@ -170,7 +170,7 @@ function sendMessage() {
     if (chat.ID === currentContactId) {
       id = chat.ID;
       // TODO: get name of user profile
-      sender = "Daniel von Ahn";
+      sender = "You";
     }
   }
 
