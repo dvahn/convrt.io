@@ -24,7 +24,7 @@
           <img :src=conversation.image>
           <span class="title-text">{{ conversation.name }}</span>
           <div class="conversation-message">
-            <p>This is a placeholder</p>
+            <p>{{ conversation.message_feed[0].content }}</p>
           </div>
         </div>
       </div>
