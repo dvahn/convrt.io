@@ -1,7 +1,8 @@
 .DS_Store
 node_modules
 /dist
-
+/Users/daniel/Documents/Master/ChatBot Projekt/convrt/Backend/~/Library/Application Support/Google/Chrome/Default
+Backend/~/Library/Application Support/Google/Chrome/Default
 
 # local env files
 .env.local
