@@ -130,7 +130,7 @@ app.post("/createLabel", async function (req, res) {
 
 // CRAWL AND INSERT NEW MESSAGES TO LINKEDIN
 app.post("/refresh", function (req, res) {
-  // mehrfach Ausführung abfangen
+  // TODO: prevent multiple execution
   let user = req.body.username;
   let syncScript = exec("bash synchronize.sh " + user, (err, stdout, stderr) => {
     if (err) {

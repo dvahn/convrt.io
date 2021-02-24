@@ -7,7 +7,6 @@
       <title>CONVRT.io</title>
     </head>
       <div id="loginOverlay">
-          <!-- <form id="loginForm" action="/" method="POST"> -->
           <div id="loginForm">
             <div class="loginComponents" id="loginComponents">
               <input id="username" class="loginInput" v-model="username" placeholder="Username" required>
@@ -18,7 +17,6 @@
             </div> 
           </div>
           {{ error }}
-          <!-- </form>  -->
       </div>
     <div id="preloader">
       <div id="loader"></div>

@@ -51,7 +51,6 @@ services:
     volumes:
       - /dev/shm:/dev/shm
       - "./storage/browser/profiles:/home/twai/profiles"
-      # - "~/Library/Application Support/Google/Chrome:/home/seluser/profiles"
     ports:
       - "9001:5900"
     links:

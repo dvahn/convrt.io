@@ -127,9 +127,7 @@ def crawl():
             new = {"$set": {"conversations": conversations_ids}}
             users.update_one(query, new)
 
-            # create new entry in conversations collection
-            # current_col_new = db[id]
-
+            # create empty message feed for current conversations
             message_feed = []
 
             lastSender = ""
@@ -166,6 +164,7 @@ def crawl():
                 message_feed.insert(0, message)
             new_conversation = {"ID": id, "associated_user": user, "name": name, "image": image_src,
                                 "show": True, "labels": ["All Messages"], "message_feed": message_feed}
+
             # create new conversation in conversation collection
             conversations.insert_one(new_conversation)
 
@@ -207,7 +206,6 @@ def crawl():
                                 xpath["only_message"].format(pos=i))
                         }
 
-                    # current.insert_one(message)
                     messages_database.insert(0, message)
 
                 messages = {"$set": {"message_feed": messages_database}}

@@ -16,9 +16,9 @@ if len(sys.argv) > 0:
     username = sys.argv[1]
     password = sys.argv[2]
 
-# XPATH
+# XPATHS
 xpath = {
-    # changes irregularly! (daily?)
+    # change irregularly! (daily?)
     "login_user": "/html/body/div/main/div[3]/form/div[1]/input",
     "login_password": "/html/body/div/main/div[3]/form/div[2]/input",
     "login_button": "/html/body/div/main/div[3]/form/div[3]/button",
@@ -38,6 +38,7 @@ xpath = {
 driver = ChromeBrowser()
 
 
+# LOGIN PROCESS
 try:
 
     driver.get("https://www.linkedin.com/login")
@@ -93,8 +94,7 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
     image = driver.find_element_by_xpath(xpath["image"].format(pos=i))
     image_src = image.get_attribute("src")
 
-    # create collection for currently scraped conversation
-    # current_col = db[id]
+    # create messageFeed for currently scraped conversation
     messageFeed = []
 
     lastSender = ""
@@ -125,16 +125,15 @@ for i in range(1, driver.get_elements_size(xpath["number_conversations"])-1):
                     xpath["only_message"].format(pos=i))
             }
 
+        # insert single message to messageFeed of currently scraped conversation
         messageFeed.append(message)
-
-        # insert single message to collection of currently scraped conversation
-        # current_col.insert_one(message)
 
     # add name + id to conversation collection
     new = {"name": name, "ID": id, "image": image_src,
            "label": "", "messageFeed": messageFeed}
     users.insert_one(new)
-# # check for empty collections
+
+# TODO: check for empty collections
 # for collection in db:
 #     if db[collection].count() == 0:
 #         db[collection].drop()
