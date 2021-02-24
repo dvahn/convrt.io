@@ -15,7 +15,10 @@ app.use(express.json());
 app.use(cors());
 
 const mongoClient = mongo.MongoClient;
+
+// CHANGE ROUTE HERE
 const url = "mongodb://ec2-13-59-233-180.us-east-2.compute.amazonaws.com:27017/convrt";
+
 const defaultLabels = ["All Messages", "Job", "Family", "Hobby"];
 
 // CREATE A NEW USER

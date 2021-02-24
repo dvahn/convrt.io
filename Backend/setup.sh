@@ -7,4 +7,4 @@ python3 -m pip install pymongo==3.5.1
 cd ..
 python3 Backend/clearDB.py
 npm run dev
-echo 'LAUNCHED CONVRT AT LOCALHOST:8080.'
+echo 'LAUNCHED CONVRT AT LOCALHOST:5000.'

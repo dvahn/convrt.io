@@ -44,6 +44,7 @@ export default {
         username: this.username,
         password: this.password
       }
+    // CHANGE ROUTE HERE
     axios.post("http://ec2-13-59-233-180.us-east-2.compute.amazonaws.com:3000/login", user)
       .then(res => {
         if (res.status === 200) {

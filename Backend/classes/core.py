@@ -27,7 +27,11 @@ class ChromeBrowser(webdriver.Chrome, webdriver.Remote):
 
         self.config = ConfigParser()
         scriptDirectory = os.path.dirname(os.path.realpath(__file__))
+
+        # CHANGE ROUTE HERE
+        # GO TO CRAWL.CONFIG AND CHANGE THE "HOST" VARIABLE
         settingsFilePath = os.path.join(scriptDirectory, "crawl.config")
+
         # self.config.read(os.path.join(
         #     os.path.dirname(__file__), 'crawl.config'))
 
