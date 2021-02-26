@@ -3,7 +3,6 @@
     <head>
     <meta charset="utf-8" />
     <title>CONVRT.io</title>
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="./css/styles.css" /> -->
   </head>
   <body>
     <div class="logout">
