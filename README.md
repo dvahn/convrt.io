@@ -55,7 +55,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 ## Bugs
 
-When running the application in the cloud, the scraping sometimes fails, because LinkedIn does not instantly accept the login and sends a verification key to the current user. This is because the cloud instances is located in the US and all earlier logins were executed from our location, which is Germany. Unfortunately the code sometimes gets send a few minutes after the login "failed" and the scraping script exited, so that there is no way of getting the code and inserting in into the verification field. This problem has to be solved in the future, maybe by setting up a proxy or trying to get around the extra verification process.
+When running the application in the cloud, the scraping sometimes fails, because LinkedIn does not instantly accept the login and sends a verification key to the current user. This is because the cloud instances is located in the US and all earlier logins were executed from our location, which is Germany. Unfortunately the code sometimes gets send a few minutes after the login "failed" and the scraping script exited, so that there is no way of getting the code and inserting in into the verification field. The same phenomenon occurs when using the application locally. Apparently, LinkedIn has implemented a mechanism that notices that the login data is not entered by a human user.
+This problem has to be solved in the future, maybe by setting up a proxy or trying to get around the extra verification process.
 
 ## Debugging
 
